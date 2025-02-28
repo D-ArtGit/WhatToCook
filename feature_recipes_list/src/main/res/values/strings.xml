@@ -1,0 +1,7 @@
+<resources>
+    <string name="header">What to cook?</string>
+    <string name="search">Search</string>
+    <string name="empty_search_result_message">Recipes was not found.</string>
+    <string name="no_saved_recipes_message">There are no saved recipes. Search and add recipes to favorites.</string>
+    <string name="unknown_error">Unknown error with internet connection</string>
+</resources>

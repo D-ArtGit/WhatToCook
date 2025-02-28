@@ -1,0 +1,66 @@
+[versions]
+agp = "8.8.1"
+kotlin = "2.1.0"
+coreKtx = "1.15.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+lifecycle = "2.8.7"
+activityCompose = "1.10.0"
+composeBom = "2025.02.00"
+dagger = "2.55"
+daggerCompiler = "2.55"
+kspGradlePlugin = "2.1.0-1.0.29"
+appcompat = "1.7.0"
+material = "1.12.0"
+roomVersion = "2.6.1"
+ktorClient = "3.1.0"
+kotlinxSerializationJson = "1.8.0"
+ktorClientContentNegotiation = "3.1.0"
+ktorSerializationKotlinxJson = "3.1.0"
+ktorClientLoggingJvm = "3.1.0"
+coilCompose = "2.7.0"
+kotlinReflect = "2.1.20-RC"
+activityComposeVersion = "1.10.1"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "daggerCompiler" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktorClient" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktorClient" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
+ktor-client-logging-jvm = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktorClientLoggingJvm" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlinReflect" }
+activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityComposeVersion" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "kspGradlePlugin" }
+kotlin-serialization = { id ="org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+android-library = { id = "com.android.library", version.ref = "agp" }
+
