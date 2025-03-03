@@ -1,8 +1,9 @@
 package ru.dartx.repo_recipes_list
 
 import ru.dartx.core.dto.RecipeCore
+import ru.dartx.local_db.dao.RecipesDao
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
-import ru.dartx.network.RecipesListApi
+import ru.dartx.network.RecipesApi
 import ru.dartx.network.dto.ResultResponse
 import ru.dartx.network.mapper.NetworkEntityMapper
 import javax.inject.Inject
@@ -14,8 +15,8 @@ data class RecipesData(
 )
 
 class RecipesListRepository @Inject constructor(
-    private val recipesListDao: ru.dartx.local_db.dao.RecipesListDao,
-    private val recipesListApi: RecipesListApi,
+    private val recipesDao: RecipesDao,
+    private val recipesApi: RecipesApi,
     private val networkEntityMapper: NetworkEntityMapper,
     private val localDbEntityMapper: LocalDbEntityMapper,
 ) {
@@ -33,8 +34,8 @@ class RecipesListRepository @Inject constructor(
     }
 
     suspend fun getSavedRecipes(): List<RecipeCore> {
-        val savedRecipes = recipesListDao.getRecipes()
-        val savedRecipesIngredients = recipesListDao.getIngredients()
+        val savedRecipes = recipesDao.getRecipes()
+        val savedRecipesIngredients = recipesDao.getIngredients()
         return savedRecipes.map { recipe ->
             localDbEntityMapper.recipeFromDbToCore(
                 recipe,
@@ -43,7 +44,7 @@ class RecipesListRepository @Inject constructor(
     }
 
     private suspend fun searchRecipesFromNet(condition: String): RecipesData {
-        return when (val response = recipesListApi.searchRecipes(condition)) {
+        return when (val response = recipesApi.searchRecipes(condition)) {
             is ResultResponse.Success -> {
                 RecipesData(
                     recipesList = response.data?.meals?.map {
@@ -65,23 +66,23 @@ class RecipesListRepository @Inject constructor(
     }
 
     private suspend fun searchSavedRecipes(condition: String) =
-        recipesListDao.searchRecipes(
+        recipesDao.searchRecipes(
             if (condition.length == 1) "$condition%" else "%$condition%"
         ).map { recipe ->
             localDbEntityMapper.recipeFromDbToCore(
                 recipe,
-                recipesListDao.getIngredientsById(recipe.id)
+                recipesDao.getIngredientsById(recipe.id)
             )
         }
 
     suspend fun saveRecipe(recipeCore: RecipeCore): Int {
         val recipe = localDbEntityMapper.recipeCoreToDb(recipeCore)
         val ingredients = recipeCore.ingredients.map { localDbEntityMapper.ingredientCoreToDb(it) }
-        val recipeId = recipesListDao.saveRecipe(recipe, ingredients)
+        val recipeId = recipesDao.saveRecipe(recipe, ingredients)
         return recipeId
     }
 
     suspend fun deleteRecipe(recipeCore: RecipeCore) {
-        recipesListDao.deleteRecipeWithIngredients(recipeCore.id)
+        recipesDao.deleteRecipeWithIngredients(recipeCore.id)
     }
 }

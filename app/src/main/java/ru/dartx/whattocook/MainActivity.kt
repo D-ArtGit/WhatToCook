@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.Modifier
 import ru.dartx.core.view_model_factory.ViewModelFactory
-import ru.dartx.feature_recipes_list.RecipesListScreen
-import ru.dartx.ui_kit.theme.WhatToCookTheme
 import ru.dartx.whattocook.di.App
 import javax.inject.Inject
 
@@ -27,12 +25,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val insets = WindowInsets.ime
-            WhatToCookTheme(darkTheme = isSystemInDarkTheme()) {
-                RecipesListScreen(
-                    viewModelFactory = viewModelFactory,
-                    modifier = Modifier.windowInsetsPadding(insets)
-                )
-            }
+            MainNavigation(
+                modifier = Modifier.windowInsetsPadding(insets),
+                viewModelFactory = viewModelFactory,
+                darkTheme = isSystemInDarkTheme()
+            )
         }
     }
 }

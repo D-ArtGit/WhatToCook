@@ -3,7 +3,10 @@ package ru.dartx.feature_recipes_list
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,6 +14,7 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,11 +51,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,27 +70,33 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.dartx.core.dto.RecipeItem
+import ru.dartx.core.navigation.Recipe
 import ru.dartx.core.view_model_factory.ViewModelFactory
+import ru.dartx.ui_kit.components.ErrorTextMessage
 import ru.dartx.ui_kit.theme.medium
 import ru.dartx.ui_kit.theme.small
 import ru.dartx.ui_kit.theme.smaller
 import ru.dartx.ui_kit.theme.smallest
 
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun RecipesListScreen(
-    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
     viewModelFactory: ViewModelFactory,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    modifier: Modifier = Modifier,
     viewModel: RecipesListViewModel = viewModel(factory = viewModelFactory),
 ) {
     val recipesListState by viewModel.recipesListState
@@ -115,10 +125,10 @@ fun RecipesListScreen(
             if (recipesListState.recipesList.isEmpty()) {
                 when (recipesListState.isSearchActive) {
                     true -> {
-                        item { EmptyListTextMessage(stringResource(R.string.empty_search_result_message)) }
+                        item { ErrorTextMessage(stringResource(R.string.empty_search_result_message)) }
                     }
 
-                    else -> item { EmptyListTextMessage(stringResource(R.string.no_saved_recipes_message)) }
+                    else -> item { ErrorTextMessage(stringResource(R.string.no_saved_recipes_message)) }
                 }
             } else {
                 items(
@@ -127,7 +137,18 @@ fun RecipesListScreen(
                     RecipeItemView(
                         recipeItem = recipeItem,
                         onSaveRecipe = viewModel::saveRecipe,
-                        onDeleteRecipe = viewModel::deleteRecipe
+                        onDeleteRecipe = viewModel::deleteRecipe,
+                        onClick = {
+                            navHostController.navigate(
+                                Recipe(
+                                    recipeItem.id,
+                                    recipeItem.extId,
+                                    recipeItem.thumbnail
+                                )
+                            )
+                        },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedContentScope = animatedContentScope,
                     )
                 }
             }
@@ -289,11 +310,15 @@ private fun ExpandedSearchView(
 
     val textFieldFocusRequester = remember { FocusRequester() }
 
-    SideEffect {
-        textFieldFocusRequester.requestFocus()
+    val needFocusRequest = rememberSaveable { mutableStateOf(true) }
+
+    LaunchedEffect(needFocusRequest) {
+        if (needFocusRequest.value)
+            textFieldFocusRequester.requestFocus()
+        needFocusRequest.value = false
     }
 
-    var textFieldValue by remember {
+    var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
 
@@ -366,27 +391,16 @@ private fun ExpandedSearchView(
     }
 }
 
-@Composable
-private fun EmptyListTextMessage(
-    message: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        modifier = modifier
-            .padding(medium)
-            .fillMaxWidth(),
-        text = message,
-        style = MaterialTheme.typography.bodyLarge,
-        textAlign = TextAlign.Center
-    )
-}
-
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun RecipeItemView(
     recipeItem: RecipeItem,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
     onSaveRecipe: (RecipeItem) -> Unit,
     onDeleteRecipe: (RecipeItem) -> Unit,
+    onClick: () -> Unit,
 ) {
     Surface(
         shadowElevation = smaller,
@@ -398,53 +412,77 @@ private fun RecipeItemView(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
-            .height(120.dp),
+            .height(120.dp)
+            .clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium
     ) {
         Row {
-            AsyncImage(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(
-                        MaterialTheme.shapes.medium.copy(
-                            topEnd = CornerSize(0.dp),
-                            bottomEnd = CornerSize(0.dp)
+            with(sharedTransitionScope) {
+                AsyncImage(
+                    modifier = Modifier
+                        .sharedElement(
+                            sharedTransitionScope.rememberSharedContentState(key = "image-${recipeItem.id}-${recipeItem.extId}"),
+                            animatedVisibilityScope = animatedContentScope
                         )
-                    ),
-                model = recipeItem.thumbnail.ifEmpty { R.drawable.thumb_example },
-                contentDescription = null
-            )
+                        .size(120.dp)
+                        .clip(
+                            MaterialTheme.shapes.medium.copy(
+                                topEnd = CornerSize(0.dp),
+                                bottomEnd = CornerSize(0.dp)
+                            )
+                        ),
+                    model = recipeItem.thumbnail.ifEmpty { R.drawable.thumb_example },
+                    contentDescription = null
+                )
+            }
 
             Column(modifier = Modifier.padding(smaller)) {
-                Row {
-                    Text(
+                with(sharedTransitionScope) {
+                    Row(
                         modifier = Modifier
-                            .weight(1F)
-                            .padding(smaller),
-                        text = recipeItem.name,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    IconButton(modifier = Modifier
-                        .size(32.dp),
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
-                        onClick = {
-                            if (recipeItem.isSaved) onDeleteRecipe(recipeItem)
-                            else onSaveRecipe(recipeItem)
-                        }) {
-                        Icon(
-                            imageVector = if (recipeItem.isSaved) Icons.Filled.Favorite
-                            else Icons.Filled.FavoriteBorder,
-                            contentDescription = null
+                            .sharedElement(
+                                sharedTransitionScope.rememberSharedContentState(key = "row-${recipeItem.id}-${recipeItem.extId}"),
+                                animatedVisibilityScope = animatedContentScope
+                            )
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .weight(1F)
+                                .padding(smaller),
+                            text = recipeItem.name,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyMedium
                         )
+                        IconButton(modifier = Modifier
+                            .size(32.dp),
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
+                            onClick = {
+                                if (recipeItem.isSaved) onDeleteRecipe(recipeItem)
+                                else onSaveRecipe(recipeItem)
+                            }) {
+                            Icon(
+                                imageVector = if (recipeItem.isSaved) Icons.Filled.Favorite
+                                else Icons.Filled.FavoriteBorder,
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
-                Text(
-                    modifier = Modifier.padding(smaller),
-                    text = recipeItem.ingredients,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall
-                )
+
+                with(sharedTransitionScope) {
+                    Text(
+                        modifier = Modifier
+                            .sharedElement(
+                                sharedTransitionScope.rememberSharedContentState(key = "ingredients-${recipeItem.id}-${recipeItem.extId}"),
+                                animatedVisibilityScope = animatedContentScope
+                            )
+                            .padding(smaller),
+                        text = recipeItem.ingredients,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
             }
         }
     }

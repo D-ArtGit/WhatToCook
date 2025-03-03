@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -40,6 +41,8 @@ dependencies {
     implementation(libs.material)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)

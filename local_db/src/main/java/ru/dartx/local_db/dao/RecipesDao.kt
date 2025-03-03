@@ -9,7 +9,7 @@ import ru.dartx.local_db.dto.Ingredient
 import ru.dartx.local_db.dto.Recipe
 
 @Dao
-interface RecipesListDao {
+interface RecipesDao {
     @Query("SELECT * FROM recipes")
     suspend fun getRecipes(): List<Recipe>
 
@@ -19,8 +19,11 @@ interface RecipesListDao {
     @Query("SELECT * FROM recipes WHERE name LIKE :cond")
     suspend fun searchRecipes(cond: String): List<Recipe>
 
-    @Query("SELECT * FROM ingredients WHERE id IS :id")
-    suspend fun getIngredientsById(id: Int): List<Ingredient>
+    @Query("SELECT * FROM recipes WHERE id IS :id LIMIT 1")
+    suspend fun getRecipeById(id: Int): Recipe
+
+    @Query("SELECT * FROM ingredients WHERE recipeId IS :recipeId")
+    suspend fun getIngredientsById(recipeId: Int): List<Ingredient>
 
     @Transaction
     suspend fun saveRecipe(recipe: Recipe, ingredients: List<Ingredient>): Int {

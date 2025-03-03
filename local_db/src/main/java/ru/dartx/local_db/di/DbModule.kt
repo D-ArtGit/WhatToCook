@@ -6,7 +6,7 @@ import dagger.Module
 import dagger.Provides
 import ru.dartx.local_db.MainDataBase
 import ru.dartx.local_db.dao.RecipeDao
-import ru.dartx.local_db.dao.RecipesListDao
+import ru.dartx.local_db.dao.RecipesDao
 
 
 @Module
@@ -20,5 +20,5 @@ object DbModule {
     fun providesRecipeDao(mainDataBase: MainDataBase): RecipeDao = mainDataBase.recipeDao()
 
     @Provides
-    fun providesRecipesListDao(mainDataBase: MainDataBase): RecipesListDao = mainDataBase.recipesListDao()
+    fun providesRecipesListDao(mainDataBase: MainDataBase): RecipesDao = mainDataBase.recipesListDao()
 }

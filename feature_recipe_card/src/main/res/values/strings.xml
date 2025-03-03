@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recipe_card_title">Recipe</string>
+    <string name="unknown_error">Something went wrong</string>
+    <string name="ingredients">Ingredients:</string>
+    <string name="instruction">Instruction:</string>
+</resources>

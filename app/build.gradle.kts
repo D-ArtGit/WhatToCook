@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
 
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
@@ -64,6 +65,8 @@ dependencies {
     implementation(project(":local_db"))
     implementation(project(":repo_recipes_list"))
     implementation(project(":feature_recipes_list"))
+    implementation(project(":repo_recipe_card"))
+    implementation(project(":feature_recipe_card"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

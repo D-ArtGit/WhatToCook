@@ -16,13 +16,13 @@ class NetworkEntityMapper @Inject constructor() {
             val strIngredientFieldName = "strIngredient$i"
             val ingredientProperty = clazz.memberProperties.find { it.name == strIngredientFieldName }
             val ingredient = ingredientProperty?.getter?.call(meal) as? String
-            if (ingredient != null) {
+            if (!ingredient.isNullOrEmpty()) {
                 val strMeasureFieldName = "strMeasure$i"
                 val measureProperty = clazz.memberProperties.find { it.name == strMeasureFieldName }
                 val measure = measureProperty?.getter?.call(meal) as? String ?: ""
                 val quantity = measure.filter { it.isDigit() || it == '/' }
                 val unitOfMeasure =
-                    measure.filter { !it.isDigit() && it != '/' }.trim()
+                    measure.filter { !it.isDigit() && it != '/' }.replace("-", "").trim()
                 ingredients.add(
                     IngredientCore(
                         id = 0,
