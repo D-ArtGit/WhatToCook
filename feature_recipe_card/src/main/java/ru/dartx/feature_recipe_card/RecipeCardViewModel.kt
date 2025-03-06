@@ -6,15 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.dartx.core.dto.RecipeCore
+import ru.dartx.core.dto.RecipeState
 import ru.dartx.repo_recipe_card.RecipeCardRepository
 import javax.inject.Inject
-
-data class RecipeState(
-    val recipe: RecipeCore? = null,
-    val errorMessage: String? = null,
-    val throwable: Throwable? = null,
-    val isLoading: Boolean = true,
-)
 
 class RecipeCardViewModel @Inject constructor(private val recipeCardRepository: RecipeCardRepository) :
     ViewModel() {
@@ -44,7 +38,7 @@ class RecipeCardViewModel @Inject constructor(private val recipeCardRepository: 
     fun deleteRecipe(recipe: RecipeCore) {
         viewModelScope.launch {
             recipeCardRepository.deleteRecipe(recipe)
-            _recipeState.value = _recipeState.value.copy(recipe = recipe.copy(isSaved = false))
+            _recipeState.value = _recipeState.value.copy(recipe = recipe.copy(id = 0, isSaved = false))
         }
     }
 }

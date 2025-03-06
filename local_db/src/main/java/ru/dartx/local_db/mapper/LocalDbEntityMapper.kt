@@ -43,6 +43,7 @@ class LocalDbEntityMapper @Inject constructor() {
         return Ingredient(
             id = ingredientCore.id,
             recipeId = ingredientCore.recipeId,
+            extId = ingredientCore.extId,
             ingredient = ingredientCore.ingredient,
             quantity = ingredientCore.quantity,
             unitOfMeasure = ingredientCore.unitOfMeasure,
@@ -53,6 +54,7 @@ class LocalDbEntityMapper @Inject constructor() {
         return IngredientCore(
             id = ingredient.id,
             recipeId = ingredient.recipeId,
+            extId = ingredient.extId,
             ingredient = ingredient.ingredient,
             quantity = ingredient.quantity,
             unitOfMeasure = ingredient.unitOfMeasure

@@ -21,6 +21,7 @@ data class Recipe(
 data class Ingredient(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val recipeId: Int,
+    val extId: Int,
     val ingredient: String,
     val quantity: String,
     val unitOfMeasure: String

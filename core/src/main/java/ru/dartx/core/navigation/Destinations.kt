@@ -9,7 +9,6 @@ object RecipesList
 data class Recipe(
     val id: Int,
     val extId: Int,
-    val imageUrl: String,
 )
 
 @Serializable

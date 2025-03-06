@@ -2,21 +2,18 @@ package ru.dartx.feature_recipes_list
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +22,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -63,7 +62,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -71,7 +69,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -83,6 +80,7 @@ import ru.dartx.core.dto.RecipeItem
 import ru.dartx.core.navigation.Recipe
 import ru.dartx.core.view_model_factory.ViewModelFactory
 import ru.dartx.ui_kit.components.ErrorTextMessage
+import ru.dartx.ui_kit.components.LoadingScreen
 import ru.dartx.ui_kit.theme.medium
 import ru.dartx.ui_kit.theme.small
 import ru.dartx.ui_kit.theme.smaller
@@ -103,58 +101,109 @@ fun RecipesListScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val listState = rememberLazyListState()
+    var previousSearchRequest by rememberSaveable { mutableStateOf("") }
 
-
+    LaunchedEffect(Unit) {
+        if (previousSearchRequest == "") viewModel.getSavedRecipes()
+        else viewModel.searchRecipes(previousSearchRequest)
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             RecipesListScreenTopAppBar(
-                onSearchDisplayChanged = { viewModel.searchRecipes(it) },
-                onSearchDisplayClosed = { viewModel.onSearchClosed() },
-                onExpandedChanged = { viewModel.setSearchState(it) },
+                onSearchDisplayChanged = {
+                    if (previousSearchRequest != it) {
+                        viewModel.searchRecipes(it)
+                        scope.launch {
+                            listState.requestScrollToItem(0)
+                        }
+                        previousSearchRequest = it
+                    }
+                },
+                onExpandedChanged = {
+                    viewModel.setSearchState(it)
+                    if (!it && previousSearchRequest.isNotEmpty()) {
+                        scope.launch {
+                            listState.requestScrollToItem(0)
+                        }
+                        previousSearchRequest = ""
+                    }
+                },
                 isSearchActive = recipesListState.isSearchActive
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(smallest)
-        ) {
-            if (recipesListState.recipesList.isEmpty()) {
-                when (recipesListState.isSearchActive) {
-                    true -> {
-                        item { ErrorTextMessage(stringResource(R.string.empty_search_result_message)) }
-                    }
+        when (recipesListState.isLoading) {
+            true -> {
+                LoadingScreen(modifier = Modifier.padding(paddingValues))
+            }
 
-                    else -> item { ErrorTextMessage(stringResource(R.string.no_saved_recipes_message)) }
-                }
-            } else {
-                items(
-                    items = recipesListState.recipesList,
-                    key = { it.id to it.extId }) { recipeItem ->
-                    RecipeItemView(
-                        recipeItem = recipeItem,
-                        onSaveRecipe = viewModel::saveRecipe,
-                        onDeleteRecipe = viewModel::deleteRecipe,
-                        onClick = {
-                            navHostController.navigate(
-                                Recipe(
-                                    recipeItem.id,
-                                    recipeItem.extId,
-                                    recipeItem.thumbnail
-                                )
-                            )
-                        },
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedContentScope = animatedContentScope,
-                    )
-                }
+            false -> {
+                RecipeListContent(
+                    recipesListState = recipesListState,
+                    viewModel = viewModel,
+                    navHostController = navHostController,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    listState = listState,
+                    modifier = Modifier.padding(paddingValues)
+                )
             }
         }
 
         Snackbar(recipesListState, scope, snackbarHostState, viewModel, context)
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun RecipeListContent(
+    recipesListState: RecipesListState,
+    viewModel: RecipesListViewModel,
+    navHostController: NavHostController,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    listState: LazyListState,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier,
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(smallest)
+    ) {
+
+        if (recipesListState.recipesList.isEmpty()) {
+            when (recipesListState.isSearchActive) {
+                true -> {
+                    item { ErrorTextMessage(stringResource(R.string.empty_search_result_message)) }
+                }
+
+                else -> item { ErrorTextMessage(stringResource(R.string.no_saved_recipes_message)) }
+            }
+        } else {
+            items(
+                items = recipesListState.recipesList,
+                key = { it.id to it.extId }) { recipeItem ->
+                RecipeItemView(
+                    recipeItem = recipeItem,
+                    onSaveRecipe = viewModel::saveRecipe,
+                    onDeleteRecipe = viewModel::deleteRecipe,
+                    onClick = {
+                        navHostController.navigate(
+                            Recipe(
+                                recipeItem.id,
+                                recipeItem.extId
+                            )
+                        )
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                )
+            }
+        }
     }
 }
 
@@ -195,7 +244,6 @@ private fun Snackbar(
 @Composable
 private fun RecipesListScreenTopAppBar(
     onSearchDisplayChanged: (String) -> Unit,
-    onSearchDisplayClosed: () -> Unit,
     onExpandedChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     isSearchActive: Boolean = false,
@@ -205,7 +253,6 @@ private fun RecipesListScreenTopAppBar(
         title = {
             ExpandableSearchView(
                 onSearchDisplayChanged = onSearchDisplayChanged,
-                onSearchDisplayClosed = onSearchDisplayClosed,
                 modifier = modifier,
                 isSearchActive = isSearchActive,
                 onExpandedChanged = onExpandedChanged,
@@ -222,49 +269,54 @@ private fun RecipesListScreenTopAppBar(
 @Composable
 private fun ExpandableSearchView(
     onSearchDisplayChanged: (String) -> Unit,
-    onSearchDisplayClosed: () -> Unit,
     modifier: Modifier = Modifier,
     isSearchActive: Boolean = false,
     onExpandedChanged: (Boolean) -> Unit,
     tint: Color,
 ) {
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-    BackHandler {
-        if (isSearchActive) {
-            onExpandedChanged(false)
-            onSearchDisplayClosed()
-        } else {
-            backDispatcher?.onBackPressed()
-        }
+    BackHandler(enabled = isSearchActive) {
+        onExpandedChanged(false)
     }
 
-    Box(modifier = modifier.height(56.dp)) {
-        val screenWidthDp: Dp = with(LocalConfiguration.current) {
-            screenWidthDp.dp
+    AnimatedContent(
+        targetState = isSearchActive,
+        modifier = modifier.height(56.dp),
+        transitionSpec = {
+            if (targetState > initialState) {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300)
+                ) togetherWith fadeOut(
+                    animationSpec = tween(
+                        durationMillis = 200,
+                        delayMillis = 100
+                    )
+                )
+            } else {
+                fadeIn(animationSpec = tween(200)) togetherWith slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300)
+                )
+            }.apply {
+                targetContentZIndex = if (isSearchActive) 1f else 0f
+            }
         }
+    ) { targetState ->
+        when (targetState) {
+            true -> {
+                ExpandedSearchView(
+                    onSearchDisplayChanged = onSearchDisplayChanged,
+                    onExpandedChanged = onExpandedChanged,
+                    tint = tint
+                )
+            }
 
-        AnimatedVisibility(
-            visible = isSearchActive,
-            enter = slideInHorizontally(initialOffsetX = { screenWidthDp.value.toInt() }) + fadeIn(),
-            exit = slideOutHorizontally(targetOffsetX = { -screenWidthDp.value.toInt() }) + fadeOut()
-        ) {
-            ExpandedSearchView(
-                onSearchDisplayChanged = onSearchDisplayChanged,
-                onSearchDisplayClosed = onSearchDisplayClosed,
-                onExpandedChanged = onExpandedChanged,
-                tint = tint
-            )
-        }
-        AnimatedVisibility(
-            visible = !isSearchActive,
-            enter = expandHorizontally() + fadeIn(),
-            exit = shrinkHorizontally() + fadeOut()
-        ) {
-            CollapsedSearchView(
-                onExpandedChanged = onExpandedChanged,
-                tint = tint
-            )
+            false -> {
+                CollapsedSearchView(
+                    onExpandedChanged = onExpandedChanged,
+                    tint = tint
+                )
+            }
         }
     }
 }
@@ -301,7 +353,6 @@ private fun CollapsedSearchView(
 @Composable
 private fun ExpandedSearchView(
     onSearchDisplayChanged: (String) -> Unit,
-    onSearchDisplayClosed: () -> Unit,
     onExpandedChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     tint: Color,
@@ -309,17 +360,15 @@ private fun ExpandedSearchView(
     val focusManager = LocalFocusManager.current
 
     val textFieldFocusRequester = remember { FocusRequester() }
-
-    val needFocusRequest = rememberSaveable { mutableStateOf(true) }
-
-    LaunchedEffect(needFocusRequest) {
-        if (needFocusRequest.value)
-            textFieldFocusRequester.requestFocus()
-        needFocusRequest.value = false
-    }
-
+    var isNeedFocusRequest by rememberSaveable { mutableStateOf(true) }
     var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
+    }
+
+    LaunchedEffect(isNeedFocusRequest) {
+        if (isNeedFocusRequest)
+            textFieldFocusRequester.requestFocus()
+        isNeedFocusRequest = false
     }
 
     LaunchedEffect(textFieldValue) {
@@ -335,7 +384,6 @@ private fun ExpandedSearchView(
     ) {
         IconButton(onClick = {
             onExpandedChanged(false)
-            onSearchDisplayClosed()
         }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -383,6 +431,8 @@ private fun ExpandedSearchView(
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.primary,
                 unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
                 focusedTextColor = tint,
                 unfocusedTextColor = tint,
                 cursorColor = tint
@@ -431,7 +481,7 @@ private fun RecipeItemView(
                                 bottomEnd = CornerSize(0.dp)
                             )
                         ),
-                    model = recipeItem.thumbnail.ifEmpty { R.drawable.thumb_example },
+                    model = recipeItem.thumbnail,
                     contentDescription = null
                 )
             }
@@ -453,8 +503,9 @@ private fun RecipeItemView(
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        IconButton(modifier = Modifier
-                            .size(32.dp),
+                        IconButton(
+                            modifier = Modifier
+                                .size(32.dp),
                             colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
                             onClick = {
                                 if (recipeItem.isSaved) onDeleteRecipe(recipeItem)

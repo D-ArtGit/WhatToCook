@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ingredients_recalculation_title">Recalculate quantity</string>
+    <string name="unknown_error">Something went wrong</string>
+    <string name="coefficient">Enter coefficient</string>
+    <string name="recalculate">Recalculate</string>
+</resources>

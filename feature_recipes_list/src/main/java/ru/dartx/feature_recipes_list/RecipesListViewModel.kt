@@ -15,6 +15,7 @@ data class RecipesListState(
     val errorMessage: String? = null,
     val throwable: Throwable? = null,
     val isSearchActive: Boolean = false,
+    val isLoading: Boolean = true,
 )
 
 class RecipesListViewModel @Inject constructor(private val recipesListRepository: RecipesListRepository) :
@@ -23,41 +24,34 @@ class RecipesListViewModel @Inject constructor(private val recipesListRepository
     val recipesListState: State<RecipesListState> get() = _recipesListState
     private val recipeList = mutableListOf<RecipeCore>()
 
-    init {
-        getSavedRecipes()
-        _recipesListState.value = _recipesListState.value.copy(isSearchActive = false)
-    }
 
-
-    private fun getSavedRecipes() {
+    fun getSavedRecipes() {
         viewModelScope.launch {
+            _recipesListState.value = _recipesListState.value.copy(isLoading = true)
             recipeList.clear()
             recipeList.addAll(recipesListRepository.getSavedRecipes())
             _recipesListState.value =
-                _recipesListState.value.copy(recipesList = recipeList.map {
-                    mapRecipeToRecipeItem(
-                        it
-                    )
-                })
+                _recipesListState.value.copy(
+                    recipesList = recipeList.map { mapRecipeToRecipeItem(it) },
+                    isLoading = false
+                )
         }
 
     }
 
     fun searchRecipes(condition: String) {
         viewModelScope.launch {
-            if (condition.isNotEmpty()) {
+            if (condition.trim().isNotEmpty()) {
+                _recipesListState.value = _recipesListState.value.copy(isLoading = true)
                 val recipesData = recipesListRepository.searchRecipes(condition)
                 recipeList.clear()
                 recipeList.addAll(recipesData.recipesList)
                 _recipesListState.value =
                     _recipesListState.value.copy(
-                        recipesList = recipeList.map {
-                            mapRecipeToRecipeItem(
-                                it
-                            )
-                        },
+                        recipesList = recipeList.map { mapRecipeToRecipeItem(it) },
                         errorMessage = recipesData.errorMessage,
-                        throwable = recipesData.throwable
+                        throwable = recipesData.throwable,
+                        isLoading = false
                     )
             } else {
                 getSavedRecipes()
@@ -65,20 +59,16 @@ class RecipesListViewModel @Inject constructor(private val recipesListRepository
         }
     }
 
-    fun onSearchClosed() {
-        getSavedRecipes()
-    }
-
     fun resetErrorState() {
-        _recipesListState.value = _recipesListState.value.copy(
+        _recipesListState.value = recipesListState.value.copy(
             errorMessage = null,
             throwable = null
         )
     }
 
     fun setSearchState(isSearchActive: Boolean) {
-        val tmpRecipesListState = _recipesListState.value.copy(isSearchActive = isSearchActive)
-        _recipesListState.value = tmpRecipesListState
+        _recipesListState.value = recipesListState.value.copy(isSearchActive = isSearchActive)
+        if (!isSearchActive) getSavedRecipes()
     }
 
     fun saveRecipe(recipeItem: RecipeItem) {
@@ -94,7 +84,7 @@ class RecipesListViewModel @Inject constructor(private val recipesListRepository
                     ) else it
                 }
                 _recipesListState.value =
-                    _recipesListState.value.copy(recipesList = _recipesListState.value.recipesList.map {
+                    recipesListState.value.copy(recipesList = recipesListState.value.recipesList.map {
                         if (it.id == recipeItem.id && it.extId == recipeItem.extId) it.copy(
                             id = newRecipeId,
                             isSaved = true
@@ -118,7 +108,7 @@ class RecipesListViewModel @Inject constructor(private val recipesListRepository
                         ) else it
                     }
                     _recipesListState.value =
-                        _recipesListState.value.copy(recipesList = _recipesListState.value.recipesList.map {
+                        recipesListState.value.copy(recipesList = recipesListState.value.recipesList.map {
                             if (it.id == recipeItem.id && it.extId == recipeItem.extId) it.copy(
                                 id = 0,
                                 isSaved = false
@@ -127,8 +117,8 @@ class RecipesListViewModel @Inject constructor(private val recipesListRepository
                 } else {
                     recipeList.removeAll { it.id == recipeItem.id && it.extId == recipeItem.extId }
                     _recipesListState.value =
-                        _recipesListState.value.copy(
-                            recipesList = _recipesListState.value.recipesList.filterNot { it.id == recipeItem.id && it.extId == recipeItem.extId }
+                        recipesListState.value.copy(
+                            recipesList = recipesListState.value.recipesList.filterNot { it.id == recipeItem.id && it.extId == recipeItem.extId }
                         )
                 }
             }

@@ -1,18 +1,13 @@
 package ru.dartx.repo_recipe_card
 
 import ru.dartx.core.dto.RecipeCore
+import ru.dartx.core.dto.RecipeData
 import ru.dartx.local_db.dao.RecipesDao
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
 import ru.dartx.network.RecipesApi
 import ru.dartx.network.dto.ResultResponse
 import ru.dartx.network.mapper.NetworkEntityMapper
 import javax.inject.Inject
-
-data class RecipeData(
-    val recipeCore: RecipeCore? = null,
-    val errorMessage: String? = null,
-    val throwable: Throwable? = null,
-)
 
 class RecipeCardRepository @Inject constructor(
     private val recipesDao: RecipesDao,
@@ -33,11 +28,11 @@ class RecipeCardRepository @Inject constructor(
         } else {
             when (val response = recipesApi.getRecipeById(extId)) {
                 is ResultResponse.Success -> {
-                    response.data?.let { RecipeData(recipeCore = networkEntityMapper.mealToRecipe(it)) } ?:
-                    RecipeData(
-                        errorMessage = "Recipe not found",
-                        throwable = null
-                    )
+                    response.data?.let { RecipeData(recipeCore = networkEntityMapper.mealToRecipe(it)) }
+                        ?: RecipeData(
+                            errorMessage = "Recipe not found",
+                            throwable = null
+                        )
                 }
 
                 is ResultResponse.Error -> {

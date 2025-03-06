@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ui-kit</string>
+    <string name="ingredients">Ingredients:</string>
 </resources>

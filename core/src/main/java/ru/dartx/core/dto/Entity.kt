@@ -18,6 +18,7 @@ data class RecipeCore(
 data class IngredientCore(
     val id: Int = 0,
     val recipeId: Int,
+    val extId: Int,
     val ingredient: String,
     val quantity: String,
     val unitOfMeasure: String
@@ -30,4 +31,17 @@ data class RecipeItem(
     val thumbnail: String,
     val ingredients: String,
     val isSaved: Boolean = false
+)
+
+data class RecipeData(
+    val recipeCore: RecipeCore? = null,
+    val errorMessage: String? = null,
+    val throwable: Throwable? = null,
+)
+
+data class RecipeState(
+    val recipe: RecipeCore? = null,
+    val errorMessage: String? = null,
+    val throwable: Throwable? = null,
+    val isLoading: Boolean = true,
 )
