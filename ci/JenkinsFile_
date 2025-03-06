@@ -4,6 +4,7 @@ pipeline {
         docker {
             image "android_otus:1"
             args '-it --memory=8g --cpus="4"'
+            label 'otus'
         }
     }
     stages {
