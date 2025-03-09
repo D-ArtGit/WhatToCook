@@ -54,8 +54,4 @@ dependencies {
     implementation(project(":repo_recipe_card"))
     implementation(project(":ui_kit"))
     implementation(project(":core"))
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }
