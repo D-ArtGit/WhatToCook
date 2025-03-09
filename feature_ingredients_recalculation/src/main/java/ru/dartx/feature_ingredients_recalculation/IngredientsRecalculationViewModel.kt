@@ -52,9 +52,18 @@ class IngredientsRecalculationViewModel @Inject constructor(
     private fun stringToDigitIngredientsMapper(ingredients: List<IngredientCore>): List<IngredientCore> =
         ingredients.map { ingredient ->
             if (ingredient.quantity.contains('/')) {
-                val divisible = ingredient.quantity.substringBefore('/').toDouble()
+                val firstPart = ingredient.quantity.substringBefore('/')
+                val divisible: Double
+                val whole: Double
+                if (firstPart.contains(' ')) {
+                    divisible = firstPart.substringAfter(' ').toDouble()
+                    whole = ingredient.quantity.substringBefore(' ').toDouble()
+                } else {
+                    divisible = firstPart.toDouble()
+                    whole = 0.0
+                }
                 val divider = ingredient.quantity.substringAfter('/').toDouble()
-                val quantity = divisible / divider
+                val quantity = whole + divisible / divider
                 val roundedQuantity =
                     quantity.toBigDecimal().setScale(2, RoundingMode.HALF_UP).toString()
                         .replace("0*$".toRegex(), "")

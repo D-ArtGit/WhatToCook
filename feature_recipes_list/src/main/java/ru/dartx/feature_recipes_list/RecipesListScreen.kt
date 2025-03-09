@@ -399,6 +399,7 @@ private fun ExpandedSearchView(
             trailingIcon = {
                 if (textFieldValue.text.isNotEmpty()) {
                     IconButton(onClick = {
+                        isNeedFocusRequest = true
                         textFieldValue = TextFieldValue()
                     }) {
                         Icon(
