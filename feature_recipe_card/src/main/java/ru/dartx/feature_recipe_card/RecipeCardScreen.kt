@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -147,6 +148,7 @@ fun RecipeCard(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 IconButton(
+                    modifier = Modifier.testTag("save_button"),
                     colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
                     onClick = {
                         if (recipe.isSaved) onDeleteRecipe(recipe)

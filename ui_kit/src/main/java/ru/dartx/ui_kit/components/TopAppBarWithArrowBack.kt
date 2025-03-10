@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +25,10 @@ fun TopAppBarWithArrowBack(
             Text(text = title)
         },
         navigationIcon = {
-            IconButton(onClick = onBackArrowPressed) {
+            IconButton(
+                modifier = Modifier.testTag("back_arrow"),
+                onClick = onBackArrowPressed
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null

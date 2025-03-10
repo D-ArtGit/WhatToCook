@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -136,7 +137,8 @@ fun IngredientsRecalculationContent(
                 onValueChange = { textFieldValue = it },
                 modifier = Modifier
                     .weight(1F)
-                    .focusRequester(textFieldFocusRequester),
+                    .focusRequester(textFieldFocusRequester)
+                    .testTag("coefficient"),
                 textStyle = MaterialTheme.typography.bodyLarge,
                 placeholder = {
                     Text(
@@ -159,7 +161,8 @@ fun IngredientsRecalculationContent(
                 },
                 modifier = Modifier
                     .weight(1F)
-                    .height(56.dp),
+                    .height(56.dp)
+                    .testTag("ingredients_recalc_button"),
                 shape = MaterialTheme.shapes.extraSmall,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
