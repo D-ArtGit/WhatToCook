@@ -41,8 +41,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import ru.dartx.ui_kit.theme.larger
 import ru.dartx.ui_kit.theme.medium
 
 @Composable
@@ -59,7 +59,7 @@ fun ExpandableSearchView(
 
     AnimatedContent(
         targetState = isSearchActive,
-        modifier = modifier.height(56.dp),
+        modifier = modifier.height(larger),
         transitionSpec = {
             if (targetState > initialState) {
                 slideIntoContainer(
@@ -108,7 +108,8 @@ private fun CollapsedSearchView(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .testTag("collapsed_search"),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -3,6 +3,7 @@ package ru.dartx.network.dto
 import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
+@Keep
 @Serializable
 data class Meals(
     val meals: List<Meal>?,

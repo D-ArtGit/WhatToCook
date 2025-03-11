@@ -60,6 +60,7 @@ import ru.dartx.core.navigation.Recipe
 import ru.dartx.core.view_model_factory.ViewModelFactory
 import ru.dartx.ui_kit.components.ErrorTextMessage
 import ru.dartx.ui_kit.components.LoadingScreen
+import ru.dartx.ui_kit.theme.imageSize
 import ru.dartx.ui_kit.theme.small
 import ru.dartx.ui_kit.theme.smaller
 import ru.dartx.ui_kit.theme.smallest
@@ -265,7 +266,7 @@ private fun RecipeItemView(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
-            .height(120.dp)
+            .height(imageSize)
             .clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium
     ) {
@@ -277,7 +278,7 @@ private fun RecipeItemView(
                             sharedTransitionScope.rememberSharedContentState(key = "image-${recipeItem.id}-${recipeItem.extId}"),
                             animatedVisibilityScope = animatedContentScope
                         )
-                        .size(120.dp)
+                        .size(imageSize)
                         .clip(
                             MaterialTheme.shapes.medium.copy(
                                 topEnd = CornerSize(0.dp),

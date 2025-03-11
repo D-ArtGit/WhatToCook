@@ -34,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
@@ -44,6 +43,7 @@ import ru.dartx.ui_kit.components.ErrorTextMessage
 import ru.dartx.ui_kit.components.IngredientsList
 import ru.dartx.ui_kit.components.LoadingScreen
 import ru.dartx.ui_kit.components.TopAppBarWithArrowBack
+import ru.dartx.ui_kit.theme.larger
 import ru.dartx.ui_kit.theme.small
 import ru.dartx.ui_kit.theme.smaller
 
@@ -161,7 +161,7 @@ fun IngredientsRecalculationContent(
                 },
                 modifier = Modifier
                     .weight(1F)
-                    .height(56.dp)
+                    .height(larger)
                     .testTag("ingredients_recalc_button"),
                 shape = MaterialTheme.shapes.extraSmall,
                 colors = ButtonDefaults.textButtonColors(

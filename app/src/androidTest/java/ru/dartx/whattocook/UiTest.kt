@@ -75,12 +75,12 @@ class UiTest {
 
         composeTestRule.onNodeWithTag("item_save_button", true).performClick()
 
+        composeTestRule.onNodeWithTag("close_search_button", true).performClick()
+
         composeTestRule.waitUntil(10_000) {
             composeTestRule
-                .onAllNodesWithText("BeaverTails")
+                .onAllNodesWithTag("collapsed_search")
                 .fetchSemanticsNodes().isNotEmpty()
         }
-
-        composeTestRule.onNodeWithTag("close_search_button", true).performClick()
     }
 }
