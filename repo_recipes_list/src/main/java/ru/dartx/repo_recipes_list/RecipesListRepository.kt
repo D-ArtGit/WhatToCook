@@ -30,7 +30,7 @@ class RecipesListRepository @Inject constructor(
         finalRecipesList.addAll(recipesListFromNet.filter { recipeFromNet ->
             savedRecipesList.find { it.extId == recipeFromNet.extId } == null
         })
-        return recipesFromNetData.copy(recipesList = finalRecipesList)
+        return recipesFromNetData.copy(recipesList = finalRecipesList.sortedBy { it.name })
     }
 
     suspend fun getSavedRecipes(): List<RecipeCore> {

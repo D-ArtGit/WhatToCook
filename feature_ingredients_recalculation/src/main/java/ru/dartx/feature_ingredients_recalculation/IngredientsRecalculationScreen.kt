@@ -1,5 +1,6 @@
 package ru.dartx.feature_ingredients_recalculation
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -14,11 +15,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -114,6 +118,14 @@ fun IngredientsRecalculationContent(
     var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
+    val textFieldAsDouble = remember {
+        derivedStateOf {
+            textFieldValue.text
+                .replace(',', '.')
+                .toDoubleOrNull()
+        }
+    }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         delay(500)
@@ -152,12 +164,16 @@ fun IngredientsRecalculationContent(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = { focusManager.clearFocus() }
-                )
+                ),
+                isError = textFieldAsDouble.value == null && textFieldValue.text.isNotEmpty(),
+                colors = OutlinedTextFieldDefaults.colors(errorTextColor = MaterialTheme.colorScheme.error)
             )
             TextButton(
                 onClick = {
-                    if (textFieldValue.text.isNotEmpty())
-                        onClickRecalc(textFieldValue.text.replace(',', '.').toDouble())
+                    textFieldAsDouble.value?.let { onClickRecalc(it) } ?: Toast.makeText(
+                        context,
+                        context.getString(R.string.enter_correct_coefficient), Toast.LENGTH_SHORT
+                    ).show()
                 },
                 modifier = Modifier
                     .weight(1F)

@@ -10,7 +10,7 @@ import ru.dartx.local_db.dto.Recipe
 
 @Dao
 interface RecipesDao {
-    @Query("SELECT * FROM recipes")
+    @Query("SELECT * FROM recipes ORDER BY name")
     suspend fun getRecipes(): List<Recipe>
 
     @Query("SELECT * FROM ingredients")
