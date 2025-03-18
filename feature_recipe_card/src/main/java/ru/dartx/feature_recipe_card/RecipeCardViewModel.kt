@@ -4,12 +4,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ru.dartx.core.dto.RecipeCore
 import ru.dartx.core.dto.RecipeState
 import ru.dartx.repo_recipe_card.RecipeCardRepository
 import javax.inject.Inject
 
+@HiltViewModel
 class RecipeCardViewModel @Inject constructor(private val recipeCardRepository: RecipeCardRepository) :
     ViewModel() {
     private val _recipeState = mutableStateOf(RecipeState())

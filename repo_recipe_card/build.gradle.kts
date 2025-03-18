@@ -38,6 +38,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":local_db"))
 
-    implementation(libs.dagger)
-    ksp(libs.dagger.compiler)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 }

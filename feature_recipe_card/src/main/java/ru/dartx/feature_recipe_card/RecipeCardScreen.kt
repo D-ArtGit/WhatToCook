@@ -29,12 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import ru.dartx.core.dto.RecipeCore
 import ru.dartx.core.navigation.IngredientsRecalc
-import ru.dartx.core.view_model_factory.ViewModelFactory
 import ru.dartx.ui_kit.components.ErrorTextMessage
 import ru.dartx.ui_kit.components.IngredientsList
 import ru.dartx.ui_kit.components.LoadingScreen
@@ -46,13 +45,12 @@ import ru.dartx.ui_kit.theme.smaller
 @Composable
 fun RecipeCardScreen(
     navHostController: NavHostController,
-    viewModelFactory: ViewModelFactory,
     id: Int,
     extId: Int,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
-    viewModel: RecipeCardViewModel = viewModel(factory = viewModelFactory),
+    viewModel: RecipeCardViewModel = hiltViewModel(),
 ) {
     val recipeState by viewModel.recipeState
     if (recipeState.recipe == null) {

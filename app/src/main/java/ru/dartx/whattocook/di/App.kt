@@ -1,7 +1,7 @@
 package ru.dartx.whattocook.di
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
-class App : Application() {
-    val component by lazy { DaggerApplicationComponent.factory().create(this) }
-}
+@HiltAndroidApp
+class App : Application()

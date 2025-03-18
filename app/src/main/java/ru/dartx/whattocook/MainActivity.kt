@@ -9,25 +9,18 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.Modifier
-import ru.dartx.core.view_model_factory.ViewModelFactory
-import ru.dartx.whattocook.di.App
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    private val component by lazy { (application as App).component }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        component.inject(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val insets = WindowInsets.ime
             MainNavigation(
                 modifier = Modifier.windowInsetsPadding(insets),
-                viewModelFactory = viewModelFactory,
                 darkTheme = isSystemInDarkTheme()
             )
         }
