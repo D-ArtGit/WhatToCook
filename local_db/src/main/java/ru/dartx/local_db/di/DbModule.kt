@@ -8,7 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ru.dartx.local_db.MainDataBase
-import ru.dartx.local_db.dao.RecipeDao
 import ru.dartx.local_db.dao.RecipesDao
 
 
@@ -21,8 +20,5 @@ object DbModule {
             .build()
 
     @Provides
-    fun providesRecipeDao(mainDataBase: MainDataBase): RecipeDao = mainDataBase.recipeDao()
-
-    @Provides
-    fun providesRecipesListDao(mainDataBase: MainDataBase): RecipesDao = mainDataBase.recipesListDao()
+    fun providesRecipesDao(mainDataBase: MainDataBase): RecipesDao = mainDataBase.recipesDao()
 }
