@@ -2,11 +2,10 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.devtools.ksp)
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "ru.dartx.core"
+    namespace = "ru.dartx.core_impl"
     compileSdk = 35
 
     defaultConfig {
@@ -39,10 +38,11 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    implementation(libs.kotlinx.serialization.json)
+    implementation(project(":core"))
 
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
