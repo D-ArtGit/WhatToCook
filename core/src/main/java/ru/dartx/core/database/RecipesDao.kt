@@ -1,12 +1,12 @@
-package ru.dartx.local_db.dao
+package ru.dartx.core.database
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import ru.dartx.local_db.dto.Ingredient
-import ru.dartx.local_db.dto.Recipe
+import ru.dartx.core.dto.Ingredient
+import ru.dartx.core.dto.Recipe
 
 @Dao
 interface RecipesDao {

@@ -1,7 +1,7 @@
 package ru.dartx.repo_recipes_list
 
 import ru.dartx.core.dto.RecipeCore
-import ru.dartx.local_db.dao.RecipesDao
+import ru.dartx.core.database.RecipesDao
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
 import ru.dartx.network.RecipesApi
 import ru.dartx.network.dto.ResultResponse

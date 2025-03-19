@@ -1,5 +1,8 @@
 package ru.dartx.core.dto
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 data class RecipeCore(
     val id: Int,
     val extId: Int,
@@ -44,4 +47,28 @@ data class RecipeState(
     val errorMessage: String? = null,
     val throwable: Throwable? = null,
     val isLoading: Boolean = true,
+)
+
+@Entity("recipes")
+data class Recipe(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val extId: Int,
+    val name: String,
+    val category: String,
+    val area: String,
+    val instruction: String,
+    val thumbnail: String,
+    val tags: String,
+    val sourceUrl: String,
+    val youTubeUrl: String
+)
+
+@Entity("ingredients")
+data class Ingredient(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val recipeId: Int,
+    val extId: Int,
+    val ingredient: String,
+    val quantity: String,
+    val unitOfMeasure: String
 )

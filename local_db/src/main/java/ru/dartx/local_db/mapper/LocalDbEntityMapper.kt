@@ -2,8 +2,8 @@ package ru.dartx.local_db.mapper
 
 import ru.dartx.core.dto.IngredientCore
 import ru.dartx.core.dto.RecipeCore
-import ru.dartx.local_db.dto.Ingredient
-import ru.dartx.local_db.dto.Recipe
+import ru.dartx.core.dto.Ingredient
+import ru.dartx.core.dto.Recipe
 import javax.inject.Inject
 
 class LocalDbEntityMapper @Inject constructor() {

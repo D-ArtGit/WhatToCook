@@ -2,7 +2,7 @@ package ru.dartx.repo_ingredients
 
 import android.app.Application
 import ru.dartx.core.dto.RecipeData
-import ru.dartx.local_db.dao.RecipesDao
+import ru.dartx.core.database.RecipesDao
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
 import ru.dartx.network.RecipesApi
 import ru.dartx.network.dto.ResultResponse
