@@ -39,6 +39,8 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":local_db"))
 
+    implementation(libs.kotlinx.coroutines)
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 }

@@ -1,5 +1,7 @@
 package ru.dartx.repo_recipes_list
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import ru.dartx.core.dto.RecipeCore
 import ru.dartx.local_db.dao.RecipesDao
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
@@ -22,15 +24,19 @@ class RecipesListRepository @Inject constructor(
 ) {
 
     suspend fun searchRecipes(condition: String): RecipesData {
-        val cond = condition.replace(" ", "%")
-        val recipesFromNetData = searchRecipesFromNet(cond)
-        val recipesListFromNet = recipesFromNetData.recipesList
-        val savedRecipesList = searchSavedRecipes(cond)
-        val finalRecipesList = savedRecipesList as MutableList
-        finalRecipesList.addAll(recipesListFromNet.filter { recipeFromNet ->
-            savedRecipesList.find { it.extId == recipeFromNet.extId } == null
-        })
-        return recipesFromNetData.copy(recipesList = finalRecipesList.sortedBy { it.name })
+        return coroutineScope {
+            val cond = condition.replace(" ", "%")
+            val deferredRecipesFromNetData = async { searchRecipesFromNet(cond) }
+            val deferredSavedRecipesList = async { searchSavedRecipes(cond) }
+            val recipesFromNetData = deferredRecipesFromNetData.await()
+            val savedRecipesList = deferredSavedRecipesList.await()
+            val recipesListFromNet = recipesFromNetData.recipesList
+            val finalRecipesList = savedRecipesList as MutableList
+            finalRecipesList.addAll(recipesListFromNet.filter { recipeFromNet ->
+                savedRecipesList.find { it.extId == recipeFromNet.extId } == null
+            })
+            recipesFromNetData.copy(recipesList = finalRecipesList.sortedBy { it.name })
+        }
     }
 
     suspend fun getSavedRecipes(): List<RecipeCore> {
