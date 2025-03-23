@@ -48,8 +48,9 @@ dependencies {
 
     implementation(libs.coil.compose)
 
-    implementation(libs.dagger)
-    ksp(libs.dagger.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.hilt.compiler)
 
     implementation(project(":repo_recipe_card"))
     implementation(project(":ui_kit"))
