@@ -23,7 +23,7 @@ rootProject.name = "WhatToCook"
 include(":app")
 include(":ui_kit")
 include(":network")
-include(":core")
+include(":core_api")
 include(":feature_recipes_list")
 include(":repo_recipes_list")
 include(":local_db")

@@ -39,8 +39,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
-    implementation(project(":core"))
+    implementation(project(":core_api"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

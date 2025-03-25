@@ -11,17 +11,16 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.Modifier
 import ru.dartx.core.mediator.AppWithFacade
 import ru.dartx.core.view_model_factory.ViewModelFactory
-import ru.dartx.whattocook.di.App
+import ru.dartx.whattocook.di.MainActivityComponent
 import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    private val component by lazy { (application as AppWithFacade).getFacade() }
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        component.inject(this)
+
+        MainActivityComponent.init((application as AppWithFacade).getFacade()).inject(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {

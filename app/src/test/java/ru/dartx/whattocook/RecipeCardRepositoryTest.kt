@@ -1,6 +1,6 @@
 package ru.dartx.whattocook
 
-import android.app.Application
+import android.content.Context
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -11,24 +11,26 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.dartx.core.database.RecipesDao
+import ru.dartx.core.mediator.ProvidersFacade
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
 import ru.dartx.network.RecipesApi
+import ru.dartx.network.dto.Meal
+import ru.dartx.network.dto.ResultResponse
 import ru.dartx.network.mapper.NetworkEntityMapper
+import ru.dartx.repo_ingredients.R
 import ru.dartx.repo_recipe_card.RecipeCardRepository
 import ru.dartx.whattocook.RecipesFactory.getIngredients
 import ru.dartx.whattocook.RecipesFactory.getRecipe
 import ru.dartx.whattocook.RecipesFactory.getRecipeCoreFromDb
 import ru.dartx.whattocook.RecipesFactory.getRecipeCoreFromNetwork
-import ru.dartx.network.dto.Meal
-import ru.dartx.network.dto.ResultResponse
-import ru.dartx.repo_ingredients.R
 
 class RecipeCardRepositoryTest {
     private lateinit var recipesDao: RecipesDao
     private lateinit var recipesApi: RecipesApi
     private lateinit var networkEntityMapper: NetworkEntityMapper
     private lateinit var localDbEntityMapper: LocalDbEntityMapper
-    private lateinit var context: Application
+    private lateinit var providersFacade: ProvidersFacade
+    private lateinit var context: Context
     private lateinit var recipeCardRepository: RecipeCardRepository
 
     @Before
@@ -37,13 +39,14 @@ class RecipeCardRepositoryTest {
         recipesApi = mock()
         networkEntityMapper = mock()
         localDbEntityMapper = mock()
+        providersFacade = mock()
         context = mock()
         recipeCardRepository = RecipeCardRepository(
             recipesDao = recipesDao,
             recipesApi = recipesApi,
             networkEntityMapper = networkEntityMapper,
             localDbEntityMapper = localDbEntityMapper,
-            context = context
+            providersFacade = providersFacade
         )
     }
 
@@ -57,7 +60,9 @@ class RecipeCardRepositoryTest {
 
         whenever(recipesDao.getRecipeById(id)).thenReturn(recipeDb)
         whenever(recipesDao.getIngredientsById(id)).thenReturn(ingredientsDb)
-        whenever(localDbEntityMapper.recipeFromDbToCore(recipeDb, ingredientsDb)).thenReturn(expectedRecipe)
+        whenever(localDbEntityMapper.recipeFromDbToCore(recipeDb, ingredientsDb)).thenReturn(
+            expectedRecipe
+        )
 
         // Act
         val result = recipeCardRepository.getRecipe(id, 0)
@@ -99,7 +104,12 @@ class RecipeCardRepositoryTest {
         val throwable = Throwable(errorMessage)
         val extId = 123
 
-        whenever(recipesApi.getRecipeById(extId)).thenReturn(ResultResponse.Error(throwable, errorMessage))
+        whenever(recipesApi.getRecipeById(extId)).thenReturn(
+            ResultResponse.Error(
+                throwable,
+                errorMessage
+            )
+        )
 
         // Act
         val result = recipeCardRepository.getRecipe(0, extId)
@@ -116,7 +126,10 @@ class RecipeCardRepositoryTest {
         // Arrange
         val extId = 123
         whenever(recipesApi.getRecipeById(extId)).thenReturn(ResultResponse.Success(null))
-        whenever(context.getString(R.string.recipe_not_found)).thenReturn("Recipe not found")
+        whenever(providersFacade.provideContext()).thenReturn(context)
+        whenever(
+            context.getString(R.string.recipe_not_found)
+        ).thenReturn("Recipe not found")
 
         // Act
         val result = recipeCardRepository.getRecipe(0, extId)

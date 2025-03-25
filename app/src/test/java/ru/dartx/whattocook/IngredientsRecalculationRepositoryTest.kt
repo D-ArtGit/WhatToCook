@@ -1,6 +1,6 @@
 package ru.dartx.whattocook
 
-import android.app.Application
+import android.content.Context
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -10,6 +10,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.dartx.core.database.RecipesDao
+import ru.dartx.core.mediator.ProvidersFacade
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
 import ru.dartx.network.RecipesApi
 import ru.dartx.network.dto.Meal
@@ -28,7 +29,8 @@ class IngredientsRecalculationRepositoryTest {
     private lateinit var recipesApi: RecipesApi
     private lateinit var networkEntityMapper: NetworkEntityMapper
     private lateinit var localDbEntityMapper: LocalDbEntityMapper
-    private lateinit var context: Application
+    private lateinit var providersFacade: ProvidersFacade
+    private lateinit var context: Context
     private lateinit var ingredientsRecalculationRepository: IngredientsRecalculationRepository
 
     @Before
@@ -37,13 +39,14 @@ class IngredientsRecalculationRepositoryTest {
         recipesApi = mock()
         networkEntityMapper = mock()
         localDbEntityMapper = mock()
+        providersFacade = mock()
         context = mock()
         ingredientsRecalculationRepository = IngredientsRecalculationRepository(
             recipesDao = recipesDao,
             recipesApi = recipesApi,
             networkEntityMapper = networkEntityMapper,
             localDbEntityMapper = localDbEntityMapper,
-            context = context
+            providersFacade = providersFacade
         )
     }
 
@@ -57,7 +60,9 @@ class IngredientsRecalculationRepositoryTest {
 
         whenever(recipesDao.getRecipeById(id)).thenReturn(recipeDb)
         whenever(recipesDao.getIngredientsById(id)).thenReturn(ingredientsDb)
-        whenever(localDbEntityMapper.recipeFromDbToCore(recipeDb, ingredientsDb)).thenReturn(expectedRecipe)
+        whenever(localDbEntityMapper.recipeFromDbToCore(recipeDb, ingredientsDb)).thenReturn(
+            expectedRecipe
+        )
 
         // Act
         val result = ingredientsRecalculationRepository.getRecipe(id, 0)
@@ -99,7 +104,12 @@ class IngredientsRecalculationRepositoryTest {
         val throwable = Throwable(errorMessage)
         val extId = 123
 
-        whenever(recipesApi.getRecipeById(extId)).thenReturn(ResultResponse.Error(throwable, errorMessage))
+        whenever(recipesApi.getRecipeById(extId)).thenReturn(
+            ResultResponse.Error(
+                throwable,
+                errorMessage
+            )
+        )
 
         // Act
         val result = ingredientsRecalculationRepository.getRecipe(0, extId)
@@ -116,7 +126,10 @@ class IngredientsRecalculationRepositoryTest {
         // Arrange
         val extId = 123
         whenever(recipesApi.getRecipeById(extId)).thenReturn(ResultResponse.Success(null))
-        whenever(context.getString(R.string.recipe_not_found)).thenReturn("Recipe not found")
+        whenever(providersFacade.provideContext()).thenReturn(context)
+        whenever(
+            context.getString(R.string.recipe_not_found)
+        ).thenReturn("Recipe not found")
 
         // Act
         val result = ingredientsRecalculationRepository.getRecipe(0, extId)
