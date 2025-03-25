@@ -1,4 +1,4 @@
-package ru.dartx.core_impl
+package ru.dartx.core_impl.database
 
 import dagger.Component
 import ru.dartx.core.database.DatabaseProvider

@@ -40,6 +40,5 @@ dependencies {
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
-
-    implementation(project(":core"))
+    implementation(project(":core_api"))
 }

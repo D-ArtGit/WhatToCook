@@ -62,7 +62,7 @@ dependencies {
 
     implementation(project(":ui_kit"))
     implementation(project(":network"))
-    implementation(project(":core"))
+    implementation(project(":core_api"))
     implementation(project(":core_factory"))
     implementation(project(":local_db"))
     implementation(project(":repo_recipes_list"))

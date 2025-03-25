@@ -1,4 +1,4 @@
-package ru.dartx.core_impl
+package ru.dartx.core_impl.database
 
 import android.content.Context
 import androidx.room.Room

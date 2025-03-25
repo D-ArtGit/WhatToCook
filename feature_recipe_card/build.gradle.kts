@@ -53,5 +53,5 @@ dependencies {
 
     implementation(project(":repo_recipe_card"))
     implementation(project(":ui_kit"))
-    implementation(project(":core"))
+    implementation(project(":core_api"))
 }

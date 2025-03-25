@@ -1,8 +1,8 @@
 package ru.dartx.repo_ingredients
 
-import android.app.Application
-import ru.dartx.core.dto.RecipeData
 import ru.dartx.core.database.RecipesDao
+import ru.dartx.core.dto.RecipeData
+import ru.dartx.core.mediator.ProvidersFacade
 import ru.dartx.local_db.mapper.LocalDbEntityMapper
 import ru.dartx.network.RecipesApi
 import ru.dartx.network.dto.ResultResponse
@@ -14,7 +14,7 @@ class IngredientsRecalculationRepository @Inject constructor(
     private val recipesApi: RecipesApi,
     private val networkEntityMapper: NetworkEntityMapper,
     private val localDbEntityMapper: LocalDbEntityMapper,
-    private val context: Application
+    private val providersFacade: ProvidersFacade
 ) {
     suspend fun getRecipe(id: Int, extId: Int): RecipeData {
         return if (id != 0) {
@@ -30,7 +30,7 @@ class IngredientsRecalculationRepository @Inject constructor(
                 is ResultResponse.Success -> {
                     response.data?.let { RecipeData(recipeCore = networkEntityMapper.mealToRecipe(it)) }
                         ?: RecipeData(
-                            errorMessage = context.getString(R.string.recipe_not_found),
+                            errorMessage = providersFacade.provideContext().getString(R.string.recipe_not_found),
                             throwable = null
                         )
                 }

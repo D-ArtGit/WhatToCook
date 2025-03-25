@@ -35,7 +35,7 @@ android {
 
 dependencies {
     implementation(project(":network"))
-    implementation(project(":core"))
+    implementation(project(":core_api"))
     implementation(project(":local_db"))
 
     implementation(libs.dagger)
