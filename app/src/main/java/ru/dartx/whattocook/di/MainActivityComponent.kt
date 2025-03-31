@@ -2,11 +2,10 @@ package ru.dartx.whattocook.di
 
 import dagger.Component
 import ru.dartx.core.mediator.ProvidersFacade
-import ru.dartx.network.di.NetworkModule
 import ru.dartx.whattocook.MainActivity
 
 @MainActivityScope
-@Component(dependencies = [ProvidersFacade::class], modules = [ViewModelModule::class, NetworkModule::class])
+@Component(dependencies = [ProvidersFacade::class], modules = [ViewModelModule::class])
 interface MainActivityComponent {
 
     fun inject(activity: MainActivity)

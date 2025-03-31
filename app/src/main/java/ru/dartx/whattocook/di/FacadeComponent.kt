@@ -5,9 +5,10 @@ import dagger.Component
 import ru.dartx.core.database.DatabaseProvider
 import ru.dartx.core.mediator.AppProvider
 import ru.dartx.core.mediator.ProvidersFacade
+import ru.dartx.core.network.NetworkClientProvider
 import ru.dartx.core_factory.CoreProvidersFactory
 
-@Component(dependencies = [AppProvider::class, DatabaseProvider::class])
+@Component(dependencies = [AppProvider::class, DatabaseProvider::class, NetworkClientProvider::class])
 interface FacadeComponent : ProvidersFacade {
 
     companion object {
@@ -21,6 +22,7 @@ interface FacadeComponent : ProvidersFacade {
                         )
                     )
                 )
+                .networkClientProvider(CoreProvidersFactory.createNetworkBuilder())
                 .build()
         }
     }

@@ -1,4 +1,4 @@
-package ru.dartx.network.di
+package ru.dartx.core_impl.network
 
 import dagger.Module
 import dagger.Provides
@@ -17,11 +17,13 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import javax.inject.Singleton
 
 @Module
 class NetworkModule {
 
     @Provides
+    @Singleton
     fun provideKtorClient(): HttpClient {
         return HttpClient(CIO) {
             engine { requestTimeout = 10000 }
@@ -61,6 +63,7 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun provideJson(): Json {
         return Json {
             prettyPrint = true
