@@ -24,6 +24,7 @@ kotlinReflect = "2.1.20-RC"
 navigationCompose = "2.8.9"
 mockito = "5.13.0"
 mockitoKotlin = "5.4.0"
+kotlinxCoroutines = "1.10.1"
 kotlinxCoroutinesTest = "1.10.1"
 
 [libraries]
@@ -60,6 +61,7 @@ kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", vers
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 
 [plugins]

@@ -4,7 +4,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ru.dartx.core.dto.IngredientCore
 import ru.dartx.core.dto.RecipeState
@@ -12,7 +11,6 @@ import ru.dartx.repo_ingredients.IngredientsRecalculationRepository
 import java.math.RoundingMode
 import javax.inject.Inject
 
-@HiltViewModel
 class IngredientsRecalculationViewModel @Inject constructor(
     private val ingredientsRecalculationRepository: IngredientsRecalculationRepository,
 ) : ViewModel() {

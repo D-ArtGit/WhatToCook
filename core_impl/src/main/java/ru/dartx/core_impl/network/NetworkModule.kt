@@ -2,8 +2,6 @@ package ru.dartx.core_impl.network
 
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
@@ -22,7 +20,6 @@ import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
 class NetworkModule {
 
     @Provides

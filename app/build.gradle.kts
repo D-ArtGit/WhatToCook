@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.devtools.ksp)
-    alias(libs.plugins.google.dagger.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
 
@@ -56,8 +55,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
 
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    implementation(libs.dagger)
+    ksp(libs.dagger.compiler)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.serialization.kotlinx.json)

@@ -38,10 +38,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import ru.dartx.core.dto.RecipeCore
+import ru.dartx.core.view_model_factory.ViewModelFactory
 import ru.dartx.ui_kit.components.ErrorTextMessage
 import ru.dartx.ui_kit.components.IngredientsList
 import ru.dartx.ui_kit.components.LoadingScreen
@@ -54,12 +55,13 @@ import ru.dartx.ui_kit.theme.smaller
 @Composable
 fun IngredientsRecalculationScreen(
     navHostController: NavHostController,
+    viewModelFactory: ViewModelFactory,
     id: Int,
     extId: Int,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
-    viewModel: IngredientsRecalculationViewModel = hiltViewModel(),
+    viewModel: IngredientsRecalculationViewModel = viewModel(factory = viewModelFactory),
 ) {
     val recipeState by viewModel.recipeState
     LaunchedEffect(Unit) {

@@ -50,13 +50,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.dartx.core.dto.RecipeItem
 import ru.dartx.core.navigation.Recipe
+import ru.dartx.core.view_model_factory.ViewModelFactory
 import ru.dartx.ui_kit.components.ErrorTextMessage
 import ru.dartx.ui_kit.components.LoadingScreen
 import ru.dartx.ui_kit.theme.imageSize
@@ -69,10 +70,11 @@ import ru.dartx.ui_kit.theme.smallest
 @Composable
 fun RecipesListScreen(
     navHostController: NavHostController,
+    viewModelFactory: ViewModelFactory,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
-    viewModel: RecipesListViewModel = hiltViewModel(),
+    viewModel: RecipesListViewModel = viewModel(factory = viewModelFactory),
 ) {
     val recipesListState by viewModel.recipesListState
     val snackbarHostState = remember { SnackbarHostState() }
