@@ -26,7 +26,7 @@ import ru.dartx.core.dto.RecipeCore
 import ru.dartx.ui_kit.theme.medium
 import ru.dartx.ui_kit.theme.small
 import ru.dartx.ui_kit.theme.smaller
-import ui_kit.R
+import ru.dartx.ui_kit.R
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

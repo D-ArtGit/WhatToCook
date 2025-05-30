@@ -1,16 +1,12 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.whattocook.android.library)
+    alias(libs.plugins.whattocook.dagger)
 }
 
 android {
     namespace = "ru.dartx.repo_recipes_list"
-    compileSdk = 35
 
     defaultConfig {
-        minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -24,13 +20,6 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 dependencies {
@@ -40,7 +29,4 @@ dependencies {
     implementation(project(":local_db"))
 
     implementation(libs.kotlinx.coroutines)
-
-    implementation(libs.dagger)
-    ksp(libs.dagger.compiler)
 }

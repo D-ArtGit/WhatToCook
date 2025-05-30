@@ -1,17 +1,13 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.whattocook.android.library)
+    alias(libs.plugins.whattocook.dagger)
     alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "ru.dartx.network"
-    compileSdk = 35
 
     defaultConfig {
-        minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -25,13 +21,6 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 dependencies {
@@ -39,10 +28,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(project(":core_api"))
 
-    implementation(libs.dagger)
-    ksp(libs.dagger.compiler)
+    implementation(project(":core_api"))
 
     implementation(libs.kotlin.reflect)
 

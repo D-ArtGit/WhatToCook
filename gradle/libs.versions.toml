@@ -1,4 +1,8 @@
 [versions]
+java = "17"
+minSdk = "24"
+targetSdk = "35"
+compileSdk = "35"
 agp = "8.10.0"
 kotlin = "2.1.10"
 coreKtx = "1.16.0"
@@ -7,9 +11,9 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycle = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2025.05.00"
-dagger = "2.55"
-kspGradlePlugin = "2.1.10-1.0.29"
+composeBom = "2025.05.01"
+dagger = "2.56"
+kspGradlePlugin = "2.1.10-1.0.31"
 appcompat = "1.7.0"
 material = "1.12.0"
 roomVersion = "2.7.1"
@@ -23,6 +27,8 @@ mockitoKotlin = "5.4.0"
 kotlinxCoroutines = "1.10.1"
 
 [libraries]
+android-tools = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -67,3 +73,8 @@ google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "kspGradle
 kotlin-serialization = { id ="org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 android-library = { id = "com.android.library", version.ref = "agp" }
 
+#Internal plugins
+whattocook-android-application = { id = "whattocook.android.application" }
+whattocook-compose-library = { id = "whattocook.compose.library" }
+whattocook-android-library = { id = "whattocook.android.library" }
+whattocook-dagger = { id = "whattocook.dagger" }
