@@ -12,6 +12,12 @@ data class Recipe(
 )
 
 @Serializable
+data class EditRecipe(
+    val id: Int,
+    val extId: Int,
+)
+
+@Serializable
 data class IngredientsRecalc(
     val id: Int,
     val extId: Int,

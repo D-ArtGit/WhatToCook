@@ -46,7 +46,9 @@ dependencies {
     implementation(project(":repo_recipes_list"))
     implementation(project(":feature_recipes_list"))
     implementation(project(":repo_recipe_card"))
+    implementation(project(":repo_edit_recipe_card"))
     implementation(project(":feature_recipe_card"))
+    implementation(project(":feature_edit_recipe_card"))
     implementation(project(":repo_ingredients"))
     implementation(project(":feature_ingredients_recalculation"))
 

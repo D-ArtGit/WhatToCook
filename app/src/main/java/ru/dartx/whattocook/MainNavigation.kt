@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import ru.dartx.core.navigation.EditRecipe
 import ru.dartx.core.navigation.IngredientsRecalc
 import ru.dartx.core.navigation.Recipe
 import ru.dartx.core.navigation.RecipesList
@@ -42,6 +43,18 @@ fun MainNavigation(
 
                 composable<Recipe> { backStackEntry ->
                     val recipe: Recipe = backStackEntry.toRoute()
+                    RecipeCardScreen(
+                        navHostController = navController,
+                        viewModelFactory = viewModelFactory,
+                        recipe.id,
+                        recipe.extId,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable
+                    )
+                }
+
+                composable<EditRecipe> { backStackEntry ->
+                    val recipe: EditRecipe = backStackEntry.toRoute()
                     RecipeCardScreen(
                         navHostController = navController,
                         viewModelFactory = viewModelFactory,
