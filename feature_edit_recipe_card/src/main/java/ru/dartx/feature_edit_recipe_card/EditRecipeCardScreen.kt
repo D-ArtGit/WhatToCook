@@ -19,16 +19,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -64,7 +71,10 @@ fun EditRecipeCardScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBarWithArrowBack(
-                title = stringResource(id = R.string.recipe_card_title),
+                title = stringResource(
+                    id = if (id != 0) R.string.recipe_card_title
+                    else R.string.new_recipe_card_title
+                ),
                 onBackArrowPressed = { navHostController.navigateUp() },
             )
         }
@@ -73,37 +83,34 @@ fun EditRecipeCardScreen(
         if (recipeState.isLoading) {
             LoadingScreen(modifier = Modifier.padding(paddingValues))
         } else {
-            if (recipeState.errorMessage != null) {
+            recipeState.errorMessage?.let {
                 ErrorTextMessage(
-                    message = recipeState.errorMessage!!,
+                    message = it,
                     modifier = Modifier.padding(paddingValues),
                 )
-            } else if (recipeState.throwable != null) {
+            } ?: recipeState.throwable?.let {
                 ErrorTextMessage(
-                    message = recipeState.throwable!!.message
+                    message = it.message
                         ?: stringResource(R.string.unknown_error),
                     modifier = Modifier.padding(paddingValues),
                 )
-            } else {
-                recipeState.recipe?.let { recipe ->
-                    RecipeCard(
-                        recipe = recipe,
-                        onSaveRecipe = { viewModel.saveRecipe(it) },
-                        onDeleteRecipe = { viewModel.deleteRecipe(it) },
-                        onClickRecalc = {
-                            navHostController.navigate(
-                                IngredientsRecalc(
-                                    id = recipe.id,
-                                    extId = recipe.extId
-                                )
+            } ?: recipeState.recipe?.let { recipe ->
+                RecipeCard(
+                    recipe = recipe,
+                    onSaveRecipe = { viewModel.saveRecipe(it) },
+                    onDeleteRecipe = { viewModel.deleteRecipe(it) },
+                    onClickRecalc = {
+                        navHostController.navigate(
+                            IngredientsRecalc(
+                                id = recipe.id,
+                                extId = recipe.extId
                             )
-                        },
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedContentScope = animatedContentScope,
-                        modifier = Modifier.padding(paddingValues),
-                    )
-                }
-
+                        )
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    modifier = Modifier.padding(paddingValues),
+                )
             }
         }
     }
@@ -205,4 +212,48 @@ fun Instruction(instruction: String, modifier: Modifier = Modifier) {
             fontFamily = FontFamily.Cursive
         )
     }
+}
+
+
+@Composable
+fun TextFieldWithErrorState(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    errorMessage: String,
+    modifier: Modifier = Modifier,
+) {
+    var text by rememberSaveable { mutableStateOf(value) }
+    var isError by rememberSaveable { mutableStateOf(false) }
+    fun validate() {
+        isError = text.isEmpty()
+    }
+
+    OutlinedTextField(
+        modifier = modifier.semantics { },
+        value = value,
+        onValueChange = {
+            text = it
+            validate()
+            if (!isError) onValueChange(it)
+        },
+        placeholder = {
+            Text(
+                text = if (isError) errorMessage else label,
+                modifier = Modifier.clearAndSetSemantics {})
+        },
+        isError = isError,
+        textStyle = MaterialTheme.typography.headlineMedium,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    TextFieldWithErrorState(
+        value = "",
+        onValueChange = {},
+        label = "Label",
+        errorMessage = "",
+    )
 }

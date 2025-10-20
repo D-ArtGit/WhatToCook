@@ -73,37 +73,34 @@ fun RecipeCardScreen(
         if (recipeState.isLoading) {
             LoadingScreen(modifier = Modifier.padding(paddingValues))
         } else {
-            if (recipeState.errorMessage != null) {
+            recipeState.errorMessage?.let {
                 ErrorTextMessage(
-                    message = recipeState.errorMessage!!,
+                    message = it,
                     modifier = Modifier.padding(paddingValues),
                 )
-            } else if (recipeState.throwable != null) {
+            } ?: recipeState.throwable?.let {
                 ErrorTextMessage(
-                    message = recipeState.throwable!!.message
+                    message = it.message
                         ?: stringResource(R.string.unknown_error),
                     modifier = Modifier.padding(paddingValues),
                 )
-            } else {
-                recipeState.recipe?.let { recipe ->
-                    RecipeCard(
-                        recipe = recipe,
-                        onSaveRecipe = { viewModel.saveRecipe(it) },
-                        onDeleteRecipe = { viewModel.deleteRecipe(it) },
-                        onClickRecalc = {
-                            navHostController.navigate(
-                                IngredientsRecalc(
-                                    id = recipe.id,
-                                    extId = recipe.extId
-                                )
+            } ?: recipeState.recipe?.let { recipe ->
+                RecipeCard(
+                    recipe = recipe,
+                    onSaveRecipe = { viewModel.saveRecipe(it) },
+                    onDeleteRecipe = { viewModel.deleteRecipe(it) },
+                    onClickRecalc = {
+                        navHostController.navigate(
+                            IngredientsRecalc(
+                                id = recipe.id,
+                                extId = recipe.extId
                             )
-                        },
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedContentScope = animatedContentScope,
-                        modifier = Modifier.padding(paddingValues),
-                    )
-                }
-
+                        )
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    modifier = Modifier.padding(paddingValues),
+                )
             }
         }
     }

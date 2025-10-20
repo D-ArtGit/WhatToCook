@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.material.icons)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 

@@ -23,6 +23,7 @@ android {
 
 dependencies {
     implementation(libs.material)
+    implementation(libs.material.icons)
 
     implementation(project(":core_api"))
 }
