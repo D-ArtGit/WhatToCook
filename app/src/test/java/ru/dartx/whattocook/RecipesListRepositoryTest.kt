@@ -123,7 +123,7 @@ class RecipesListRepositoryTest {
     }
 
     @Test
-    fun `saveRecipe should delegate to DAO with mapped entities`() = runTest {
+    fun `addRecipeToFavorites should delegate to DAO with mapped entities`() = runTest {
         // Arrange
         val recipeDb = getRecipe()
         val ingredientsDb = getIngredients()
@@ -138,7 +138,7 @@ class RecipesListRepositoryTest {
         whenever(recipesDao.saveRecipe(any(), any())).thenReturn(expectedId)
 
         // Act
-        val id = recipesListRepository.saveRecipe(recipeCore)
+        val id = recipesListRepository.addRecipeToFavorites(recipeCore)
 
         // Assert
         verify(recipesDao).saveRecipe(recipeDb, ingredientsDb)
@@ -146,12 +146,12 @@ class RecipesListRepositoryTest {
     }
 
     @Test
-    fun `deleteRecipe should call DAO with correct id`() = runTest {
+    fun `removeRecipeFromFavorites should call DAO with correct id`() = runTest {
         // Arrange
         val recipeCore = getRecipeCoreFromDb()
 
         // Act
-        recipesListRepository.deleteRecipe(recipeCore)
+        recipesListRepository.removeRecipeFromFavorites(recipeCore)
 
         // Assert
         verify(recipesDao).deleteRecipeWithIngredients(recipeCore.id)

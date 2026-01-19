@@ -168,8 +168,8 @@ private fun RecipeListContent(
                 key = { it.id to it.extId }) { recipeItem ->
                 RecipeItemView(
                     recipeItem = recipeItem,
-                    onSaveRecipe = viewModel::saveRecipe,
-                    onDeleteRecipe = viewModel::deleteRecipe,
+                    onAddToFavorites = viewModel::addRecipeToFavorites,
+                    onRemoveFromFavorites = viewModel::removeRecipeFromFavorites,
                     onClick = {
                         navHostController.navigate(
                             Recipe(
@@ -252,8 +252,8 @@ private fun RecipeItemView(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
-    onSaveRecipe: (RecipeItem) -> Unit,
-    onDeleteRecipe: (RecipeItem) -> Unit,
+    onAddToFavorites: (RecipeItem) -> Unit,
+    onRemoveFromFavorites: (RecipeItem) -> Unit,
     onClick: () -> Unit,
 ) {
     Surface(
@@ -314,8 +314,8 @@ private fun RecipeItemView(
                                 .testTag("item_save_button"),
                             colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
                             onClick = {
-                                if (recipeItem.isSaved) onDeleteRecipe(recipeItem)
-                                else onSaveRecipe(recipeItem)
+                                if (recipeItem.isSaved) onRemoveFromFavorites(recipeItem)
+                                else onAddToFavorites(recipeItem)
                             }) {
                             Icon(
                                 imageVector = if (recipeItem.isSaved) Icons.Filled.Favorite

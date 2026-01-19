@@ -87,8 +87,8 @@ fun RecipeCardScreen(
             } ?: recipeState.recipe?.let { recipe ->
                 RecipeCard(
                     recipe = recipe,
-                    onSaveRecipe = { viewModel.saveRecipe(it) },
-                    onDeleteRecipe = { viewModel.deleteRecipe(it) },
+                    onAddRecipeToFavorites = { viewModel.addRecipeToFavorites(it) },
+                    onRemoveRecipeFromFavorite = { viewModel.removeRecipeFromFavorites(it) },
                     onClickRecalc = {
                         navHostController.navigate(
                             IngredientsRecalc(
@@ -111,8 +111,8 @@ fun RecipeCardScreen(
 @Composable
 fun RecipeCard(
     recipe: RecipeCore,
-    onSaveRecipe: (RecipeCore) -> Unit,
-    onDeleteRecipe: (RecipeCore) -> Unit,
+    onAddRecipeToFavorites: (RecipeCore) -> Unit,
+    onRemoveRecipeFromFavorite: (RecipeCore) -> Unit,
     onClickRecalc: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
@@ -148,8 +148,8 @@ fun RecipeCard(
                     modifier = Modifier.testTag("save_button"),
                     colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
                     onClick = {
-                        if (recipe.isSaved) onDeleteRecipe(recipe)
-                        else onSaveRecipe(recipe)
+                        if (recipe.isSaved) onRemoveRecipeFromFavorite(recipe)
+                        else onAddRecipeToFavorites(recipe)
                     }) {
                     Icon(
                         imageVector = if (recipe.isSaved) Icons.Filled.Favorite

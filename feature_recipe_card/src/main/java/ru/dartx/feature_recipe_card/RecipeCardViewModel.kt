@@ -28,16 +28,16 @@ class RecipeCardViewModel @Inject constructor(private val recipeCardRepository: 
         }
     }
 
-    fun saveRecipe(recipe: RecipeCore) {
+    fun addRecipeToFavorites(recipe: RecipeCore) {
         viewModelScope.launch {
-            val newRecipeId = recipeCardRepository.saveRecipe(recipe)
+            val newRecipeId = recipeCardRepository.addRecipeToFavorites(recipe)
             _recipeState.value = _recipeState.value.copy(recipe = recipe.copy(id = newRecipeId, isSaved = true))
         }
     }
 
-    fun deleteRecipe(recipe: RecipeCore) {
+    fun removeRecipeFromFavorites(recipe: RecipeCore) {
         viewModelScope.launch {
-            recipeCardRepository.deleteRecipe(recipe)
+            recipeCardRepository.removeRecipeFromFavorites(recipe)
             _recipeState.value = _recipeState.value.copy(recipe = recipe.copy(id = 0, isSaved = false))
         }
     }

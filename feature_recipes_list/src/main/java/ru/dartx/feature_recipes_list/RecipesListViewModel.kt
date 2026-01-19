@@ -71,12 +71,12 @@ class RecipesListViewModel @Inject constructor(private val recipesListRepository
         if (!isSearchActive) getSavedRecipes()
     }
 
-    fun saveRecipe(recipeItem: RecipeItem) {
+    fun addRecipeToFavorites(recipeItem: RecipeItem) {
         viewModelScope.launch {
             val recipeCore =
                 recipeList.find { it.id == recipeItem.id && it.extId == recipeItem.extId }
             if (recipeCore != null) {
-                val newRecipeId = recipesListRepository.saveRecipe(recipeCore)
+                val newRecipeId = recipesListRepository.addRecipeToFavorites(recipeCore)
                 recipeList.replaceAll {
                     if (it.id == recipeItem.id && it.extId == recipeItem.extId) it.copy(
                         id = newRecipeId,
@@ -94,12 +94,12 @@ class RecipesListViewModel @Inject constructor(private val recipesListRepository
         }
     }
 
-    fun deleteRecipe(recipeItem: RecipeItem) {
+    fun removeRecipeFromFavorites(recipeItem: RecipeItem) {
         viewModelScope.launch {
             val recipeCore =
                 recipeList.find { it.id == recipeItem.id && it.extId == recipeItem.extId }
             if (recipeCore != null) {
-                recipesListRepository.deleteRecipe(recipeCore)
+                recipesListRepository.removeRecipeFromFavorites(recipeCore)
                 if (recipesListState.value.isSearchActive) {
                     recipeList.replaceAll {
                         if (it.id == recipeItem.id && it.extId == recipeItem.extId) it.copy(

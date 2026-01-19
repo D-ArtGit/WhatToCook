@@ -47,14 +47,14 @@ class RecipeCardRepository @Inject constructor(
         }
     }
 
-    suspend fun saveRecipe(recipeCore: RecipeCore): Int {
+    suspend fun addRecipeToFavorites(recipeCore: RecipeCore): Int {
         val recipe = localDbEntityMapper.recipeCoreToDb(recipeCore)
         val ingredients = recipeCore.ingredients.map { localDbEntityMapper.ingredientCoreToDb(it) }
         val recipeId = recipesDao.saveRecipe(recipe, ingredients)
         return recipeId
     }
 
-    suspend fun deleteRecipe(recipeCore: RecipeCore) {
+    suspend fun removeRecipeFromFavorites(recipeCore: RecipeCore) {
         recipesDao.deleteRecipeWithIngredients(recipeCore.id)
     }
 }
