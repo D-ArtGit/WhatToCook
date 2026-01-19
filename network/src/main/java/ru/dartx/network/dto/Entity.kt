@@ -63,5 +63,5 @@ data class Meal(
     val strSource: String?,
     val strImageSource: String?,
     val strCreativeCommonsConfirmed: String?,
-    val dateModified: Long?,
+    val dateModified: String?,
 )
