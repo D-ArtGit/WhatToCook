@@ -1,10 +1,9 @@
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import ru.dartx.whattocook.configureKotlinAndroid
-import ru.dartx.whattocook.libs
 
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
@@ -14,7 +13,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk =libs.findVersion("targetSdk").get().toString().toInt()
             }
         }
     }
