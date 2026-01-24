@@ -1,8 +1,10 @@
+import com.android.build.api.dsl.LibraryExtension
+
 plugins {
     alias(libs.plugins.whattocook.android.library)
 }
 
-android {
+configure<LibraryExtension> {
     namespace = "ru.dartx.core_factory"
 
     defaultConfig {

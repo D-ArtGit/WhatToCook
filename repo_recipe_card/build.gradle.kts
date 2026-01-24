@@ -1,9 +1,11 @@
+import com.android.build.api.dsl.LibraryExtension
+
 plugins {
     alias(libs.plugins.whattocook.android.library)
     alias(libs.plugins.whattocook.dagger)
 }
 
-android {
+configure<LibraryExtension> {
     namespace = "ru.dartx.repo_recipe_card"
 
     defaultConfig {

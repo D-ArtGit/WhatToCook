@@ -1,8 +1,10 @@
+import com.android.build.api.dsl.LibraryExtension
+
 plugins {
     alias(libs.plugins.whattocook.compose.library)
 }
 
-android {
+configure<LibraryExtension> {
     namespace = "ru.dartx.ui_kit"
 
     defaultConfig {

@@ -1,10 +1,12 @@
+import com.android.build.api.dsl.ApplicationExtension
+
 plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.whattocook.android.application)
     alias(libs.plugins.whattocook.dagger)
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "ru.dartx.whattocook"
 
     defaultConfig {
