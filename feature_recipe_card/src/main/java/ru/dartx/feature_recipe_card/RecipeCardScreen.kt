@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import ru.dartx.core.dto.RecipeCore
+import ru.dartx.core.navigation.EditRecipe
 import ru.dartx.core.navigation.IngredientsRecalc
 import ru.dartx.core.view_model_factory.ViewModelFactory
 import ru.dartx.ui_kit.components.ErrorTextMessage
@@ -55,16 +57,29 @@ fun RecipeCardScreen(
     viewModel: RecipeCardViewModel = viewModel(factory = viewModelFactory),
 ) {
     val recipeState by viewModel.recipeState
-    if (recipeState.recipe == null) {
-        LaunchedEffect(Unit) {
-            viewModel.getRecipe(id, extId)
-        }
+//    if (recipeState.recipe == null) {
+    LaunchedEffect(Unit) {
+        viewModel.getRecipe(id, extId)
     }
+//    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBarWithArrowBack(
                 title = stringResource(id = R.string.recipe_card_title),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            navHostController.navigate(EditRecipe(id, extId))
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
                 onBackArrowPressed = { navHostController.navigateUp() },
             )
         }
@@ -127,38 +142,13 @@ fun RecipeCard(
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(medium)
     ) {
-        with(sharedTransitionScope) {
-            Row(
-                modifier = Modifier
-                    .sharedElement(
-                        sharedTransitionScope.rememberSharedContentState(key = "row-${recipe.id}-${recipe.extId}"),
-                        animatedVisibilityScope = animatedContentScope
-                    )
-                    .padding(start = medium, end = medium, top = medium),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier
-                        .weight(1F)
-                        .padding(smaller),
-                    text = recipe.name,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                IconButton(
-                    modifier = Modifier.testTag("save_button"),
-                    colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
-                    onClick = {
-                        if (recipe.isSaved) onRemoveRecipeFromFavorite(recipe)
-                        else onAddRecipeToFavorites(recipe)
-                    }) {
-                    Icon(
-                        imageVector = if (recipe.isSaved) Icons.Filled.Favorite
-                        else Icons.Filled.FavoriteBorder,
-                        contentDescription = null
-                    )
-                }
-            }
-        }
+        Header(
+            onRemoveRecipeFromFavorite = onRemoveRecipeFromFavorite,
+            onAddRecipeToFavorites = onAddRecipeToFavorites,
+            recipe = recipe,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
+        )
 
         with(sharedTransitionScope) {
             AsyncImage(
@@ -181,25 +171,86 @@ fun RecipeCard(
             onClickRecalc = onClickRecalc,
         )
 
-        Instruction(instruction = recipe.instruction)
+        Instruction(
+            recipe = recipe,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope
+        )
     }
 }
 
 @Composable
-fun Instruction(instruction: String, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(start = medium, end = medium)) {
-        Text(
-            modifier = Modifier
-                .padding(smaller),
-            text = stringResource(id = R.string.instruction),
-            style = MaterialTheme.typography.headlineSmall
-        )
-        Text(
-            modifier = Modifier
-                .padding(smaller),
-            text = instruction,
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = FontFamily.Cursive
-        )
+fun Header(
+    onRemoveRecipeFromFavorite: (RecipeCore) -> Unit,
+    onAddRecipeToFavorites: (RecipeCore) -> Unit,
+    recipe: RecipeCore,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    modifier: Modifier = Modifier,
+) {
+    with(sharedTransitionScope) {
+        Row(
+            modifier = modifier
+                .sharedElement(
+                    sharedTransitionScope.rememberSharedContentState(key = "row-${recipe.id}-${recipe.extId}"),
+                    animatedVisibilityScope = animatedContentScope
+                )
+                .padding(start = medium, end = medium, top = medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier
+                    .weight(1F)
+                    .padding(smaller),
+                text = recipe.name,
+                style = MaterialTheme.typography.headlineMedium
+            )
+            IconButton(
+                modifier = Modifier.testTag("save_button"),
+                colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
+                onClick = {
+                    if (recipe.isSaved) onRemoveRecipeFromFavorite(recipe)
+                    else onAddRecipeToFavorites(recipe)
+                }) {
+                Icon(
+                    imageVector = if (recipe.isSaved) Icons.Filled.Favorite
+                    else Icons.Filled.FavoriteBorder,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun Instruction(
+    recipe: RecipeCore,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    modifier: Modifier = Modifier,
+) {
+    with(sharedTransitionScope) {
+        Column(
+            modifier = modifier
+                .sharedElement(
+                    sharedTransitionScope.rememberSharedContentState(key = "instruction-${recipe.id}-${recipe.extId}"),
+                    animatedVisibilityScope = animatedContentScope
+                )
+                .padding(start = medium, end = medium)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(smaller),
+                text = stringResource(id = R.string.instruction),
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                modifier = Modifier
+                    .padding(smaller),
+                text = recipe.instruction,
+                style = MaterialTheme.typography.bodyMedium,
+                fontFamily = FontFamily.Cursive
+            )
+        }
     }
 }

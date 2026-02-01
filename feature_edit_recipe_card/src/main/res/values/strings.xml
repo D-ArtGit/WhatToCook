@@ -4,4 +4,8 @@
     <string name="new_recipe_card_title">Fill recipe</string>
     <string name="unknown_error">Something went wrong</string>
     <string name="instruction">Instruction:</string>
+    <string name="name_label">Enter recipe name</string>
+    <string name="name_is_empty">Recipe name can`t be empty</string>
+    <string name="instruction_label">Enter recipe instruction</string>
+    <string name="instruction_is_empty">Recipe instruction can`t be empty</string>
 </resources>

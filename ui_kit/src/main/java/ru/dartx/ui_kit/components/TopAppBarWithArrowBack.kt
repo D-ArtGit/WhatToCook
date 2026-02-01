@@ -1,5 +1,6 @@
 package ru.dartx.ui_kit.components
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,11 +20,13 @@ fun TopAppBarWithArrowBack(
     title: String,
     onBackArrowPressed: () -> Unit,
     modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
         title = {
             Text(text = title)
         },
+        actions = actions,
         navigationIcon = {
             IconButton(
                 modifier = Modifier.testTag("back_arrow"),

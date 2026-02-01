@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -25,16 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -62,7 +62,9 @@ fun EditRecipeCardScreen(
     viewModel: EditRecipeCardViewModel = viewModel(factory = viewModelFactory),
 ) {
     val recipeState by viewModel.recipeState
-    if (recipeState.recipe == null) {
+    val recipeValidatorState by viewModel.recipeValidatorState
+
+    if (recipeState.recipe == null && (id != 0 || extId != 0)) {
         LaunchedEffect(Unit) {
             viewModel.getRecipe(id, extId)
         }
@@ -75,6 +77,20 @@ fun EditRecipeCardScreen(
                     id = if (id != 0) R.string.recipe_card_title
                     else R.string.new_recipe_card_title
                 ),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (recipeState.recipe?.let { viewModel.saveRecipe(it) } == true)
+                                navHostController.navigateUp()
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Save,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
                 onBackArrowPressed = { navHostController.navigateUp() },
             )
         }
@@ -97,6 +113,7 @@ fun EditRecipeCardScreen(
             } ?: recipeState.recipe?.let { recipe ->
                 RecipeCard(
                     recipe = recipe,
+                    recipeValidatorState = recipeValidatorState,
                     onSaveRecipe = { viewModel.saveRecipe(it) },
                     onDeleteRecipe = { viewModel.deleteRecipe(it) },
                     onClickRecalc = {
@@ -107,6 +124,8 @@ fun EditRecipeCardScreen(
                             )
                         )
                     },
+                    onRecipeNameChanged = { viewModel.setRecipeName(it) },
+                    onRecipeInstructionChanged = { viewModel.setRecipeInstruction(it) },
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,
                     modifier = Modifier.padding(paddingValues),
@@ -121,9 +140,12 @@ fun EditRecipeCardScreen(
 @Composable
 fun RecipeCard(
     recipe: RecipeCore,
+    recipeValidatorState: EditRecipeCardViewModel.RecipeValidatorState,
     onSaveRecipe: (RecipeCore) -> Unit,
     onDeleteRecipe: (RecipeCore) -> Unit,
     onClickRecalc: () -> Unit,
+    onRecipeNameChanged: (String) -> Unit,
+    onRecipeInstructionChanged: (String) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
@@ -137,38 +159,30 @@ fun RecipeCard(
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(medium)
     ) {
-        with(sharedTransitionScope) {
-            Row(
-                modifier = Modifier
-                    .sharedElement(
-                        sharedTransitionScope.rememberSharedContentState(key = "row-${recipe.id}-${recipe.extId}"),
-                        animatedVisibilityScope = animatedContentScope
-                    )
-                    .padding(start = medium, end = medium, top = medium),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier
-                        .weight(1F)
-                        .padding(smaller),
-                    text = recipe.name,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                IconButton(
-                    modifier = Modifier.testTag("save_button"),
-                    colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
-                    onClick = {
-                        if (recipe.isSaved) onDeleteRecipe(recipe)
-                        else onSaveRecipe(recipe)
-                    }) {
-                    Icon(
-                        imageVector = if (recipe.isSaved) Icons.Filled.Favorite
-                        else Icons.Filled.FavoriteBorder,
-                        contentDescription = null
-                    )
-                }
-            }
-        }
+        Header(
+            onRecipeNameChanged = onRecipeNameChanged,
+            onDeleteRecipe = onDeleteRecipe,
+            onSaveRecipe = onSaveRecipe,
+            recipe = recipe,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
+            nameErrorMessage = recipeValidatorState.nameErrorMessage
+        )
+
+        IngredientsList(
+            recipe = recipe,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
+            onClickRecalc = onClickRecalc,
+        )
+
+        Instruction(
+            onRecipeInstructionChanged = { onRecipeInstructionChanged(it) },
+            recipe = recipe,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
+            instructionErrorMessage = recipeValidatorState.instructionErrorMessage,
+        )
 
         with(sharedTransitionScope) {
             AsyncImage(
@@ -183,77 +197,138 @@ fun RecipeCard(
                     .aspectRatio(1F / 1F)
             )
         }
-
-        IngredientsList(
-            recipe = recipe,
-            sharedTransitionScope = sharedTransitionScope,
-            animatedContentScope = animatedContentScope,
-            onClickRecalc = onClickRecalc,
-        )
-
-        Instruction(instruction = recipe.instruction)
     }
 }
 
 @Composable
-fun Instruction(instruction: String, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(start = medium, end = medium)) {
-        Text(
-            modifier = Modifier
-                .padding(smaller),
-            text = stringResource(id = R.string.instruction),
-            style = MaterialTheme.typography.headlineSmall
-        )
-        Text(
-            modifier = Modifier
-                .padding(smaller),
-            text = instruction,
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = FontFamily.Cursive
-        )
+fun Header(
+    onRecipeNameChanged: (String) -> Unit,
+    onDeleteRecipe: (RecipeCore) -> Unit,
+    onSaveRecipe: (RecipeCore) -> Unit,
+    recipe: RecipeCore,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    modifier: Modifier = Modifier,
+    nameErrorMessage: Int? = null,
+) {
+    with(sharedTransitionScope) {
+        Row(
+            modifier = modifier
+                .sharedElement(
+                    sharedTransitionScope.rememberSharedContentState(key = "row-${recipe.id}-${recipe.extId}"),
+                    animatedVisibilityScope = animatedContentScope
+                )
+                .padding(start = medium, end = medium, top = medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextInputFieldWithErrorState(
+                modifier = Modifier
+                    .weight(1F)
+                    .padding(smaller),
+                value = recipe.name,
+                onValueChange = { onRecipeNameChanged(it) },
+                label = stringResource(id = R.string.name_label),
+                errorMessage = nameErrorMessage?.let { stringResource(it) },
+                textStyle = MaterialTheme.typography.headlineMedium,
+                imeAction = ImeAction.Next
+            )
+            IconButton(
+                modifier = Modifier.testTag("save_button"),
+                colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
+                onClick = {
+                    if (recipe.isSaved) onDeleteRecipe(recipe)
+                    else onSaveRecipe(recipe)
+                }) {
+                Icon(
+                    imageVector = if (recipe.isSaved) Icons.Filled.Favorite
+                    else Icons.Filled.FavoriteBorder,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun Instruction(
+    onRecipeInstructionChanged: (String) -> Unit,
+    recipe: RecipeCore,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    modifier: Modifier = Modifier,
+    instructionErrorMessage: Int? = null,
+) {
+    with(sharedTransitionScope) {
+
+        Column(
+            modifier = modifier
+                .sharedElement(
+                    sharedTransitionScope.rememberSharedContentState(key = "instruction-${recipe.id}-${recipe.extId}"),
+                    animatedVisibilityScope = animatedContentScope
+                )
+                .padding(start = medium, end = medium)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(smaller),
+                text = stringResource(id = R.string.instruction),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            TextInputFieldWithErrorState(
+                modifier = Modifier
+                    .padding(smaller),
+                value = recipe.instruction,
+                onValueChange = { onRecipeInstructionChanged(it) },
+                label = stringResource(id = R.string.instruction_label),
+                errorMessage = instructionErrorMessage?.let { stringResource(it) },
+                textStyle = MaterialTheme.typography.bodyMedium,
+                imeAction = ImeAction.Done
+            )
+        }
     }
 }
 
 
 @Composable
-fun TextFieldWithErrorState(
+fun TextInputFieldWithErrorState(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    errorMessage: String,
     modifier: Modifier = Modifier,
+    errorMessage: String? = null,
+    textStyle: TextStyle = MaterialTheme.typography.headlineMedium,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Done,
 ) {
-    var text by rememberSaveable { mutableStateOf(value) }
-    var isError by rememberSaveable { mutableStateOf(false) }
-    fun validate() {
-        isError = text.isEmpty()
-    }
-
     OutlinedTextField(
         modifier = modifier.semantics { },
         value = value,
         onValueChange = {
-            text = it
-            validate()
-            if (!isError) onValueChange(it)
+            onValueChange(it)
+        },
+        label = {
+            Text(
+                text = label,
+            )
         },
         placeholder = {
             Text(
-                text = if (isError) errorMessage else label,
-                modifier = Modifier.clearAndSetSemantics {})
+                text = if (!errorMessage.isNullOrEmpty()) errorMessage else "",
+                style = textStyle.copy(color = MaterialTheme.colorScheme.error)
+            )
         },
-        isError = isError,
-        textStyle = MaterialTheme.typography.headlineMedium,
+        isError = !errorMessage.isNullOrEmpty(),
+        textStyle = textStyle,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        )
     )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    TextFieldWithErrorState(
-        value = "",
-        onValueChange = {},
-        label = "Label",
-        errorMessage = "",
-    )
+
 }

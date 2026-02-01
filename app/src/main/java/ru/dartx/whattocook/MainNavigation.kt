@@ -13,6 +13,7 @@ import ru.dartx.core.navigation.IngredientsRecalc
 import ru.dartx.core.navigation.Recipe
 import ru.dartx.core.navigation.RecipesList
 import ru.dartx.core.view_model_factory.ViewModelFactory
+import ru.dartx.feature_edit_recipe_card.EditRecipeCardScreen
 import ru.dartx.feature_ingredients_recalculation.IngredientsRecalculationScreen
 import ru.dartx.feature_recipe_card.RecipeCardScreen
 import ru.dartx.feature_recipes_list.RecipesListScreen
@@ -55,7 +56,7 @@ fun MainNavigation(
 
                 composable<EditRecipe> { backStackEntry ->
                     val recipe: EditRecipe = backStackEntry.toRoute()
-                    RecipeCardScreen(
+                    EditRecipeCardScreen(
                         navHostController = navController,
                         viewModelFactory = viewModelFactory,
                         recipe.id,
