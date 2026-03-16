@@ -51,8 +51,13 @@ class EditRecipeCardViewModel @Inject constructor(private val editRecipeCardRepo
                 _recipeValidatorState.value.copy(instructionErrorMessage = R.string.instruction_is_empty)
         } else {
             _recipeValidatorState.value =
-                _recipeValidatorState.value.copy(instructionErrorMessage = null)
+            _recipeValidatorState.value.copy(instructionErrorMessage = null)
         }
+    }
+
+    fun setRecipeThumbnail(thumbnail: String) {
+        _recipeState.value =
+            _recipeState.value.copy(recipe = _recipeState.value.recipe?.copy(thumbnail = thumbnail))
     }
 
 

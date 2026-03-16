@@ -27,6 +27,7 @@ mockito = "5.22.0"
 mockitoKotlin = "6.2.3"
 kotlinxCoroutines = "1.10.2"
 uiTooling = "1.10.4"
+imageCropView = "4.0.0"
 
 [libraries]
 android-tools = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -69,6 +70,7 @@ kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutin
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiTooling" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+image-crop-view = { group = "io.github.rroohit", name = "ImageCropView", version.ref = "imageCropView" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

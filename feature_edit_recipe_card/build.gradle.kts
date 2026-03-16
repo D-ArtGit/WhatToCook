@@ -34,6 +34,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.coil.compose)
+    implementation(libs.image.crop.view)
+    implementation(libs.kotlinx.coroutines)
 
     implementation(project(":repo_edit_recipe_card"))
     implementation(project(":ui_kit"))

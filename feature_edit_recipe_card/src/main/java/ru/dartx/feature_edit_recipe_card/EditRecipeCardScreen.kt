@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -126,6 +127,7 @@ fun EditRecipeCardScreen(
                     },
                     onRecipeNameChanged = { viewModel.setRecipeName(it) },
                     onRecipeInstructionChanged = { viewModel.setRecipeInstruction(it) },
+                    onRecipeThumbnailChanged = { viewModel.setRecipeThumbnail(it) },
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,
                     modifier = Modifier.padding(paddingValues),
@@ -146,12 +148,14 @@ fun RecipeCard(
     onClickRecalc: () -> Unit,
     onRecipeNameChanged: (String) -> Unit,
     onRecipeInstructionChanged: (String) -> Unit,
+    onRecipeThumbnailChanged: (String) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
 ) {
 
     val scrollState = rememberScrollState()
+    val imagePicker = rememberImagePicker()
 
     Column(
         modifier = modifier
@@ -159,6 +163,9 @@ fun RecipeCard(
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(medium)
     ) {
+        imagePicker?.SourcePickerHost()
+        imagePicker?.CropperHost()
+
         Header(
             onRecipeNameChanged = onRecipeNameChanged,
             onDeleteRecipe = onDeleteRecipe,
@@ -195,6 +202,13 @@ fun RecipeCard(
                     )
                     .fillMaxWidth()
                     .aspectRatio(1F / 1F)
+                    .clickable(enabled = imagePicker != null) {
+                        imagePicker?.pickImage { uri ->
+                            if (!uri.isNullOrBlank()) {
+                                onRecipeThumbnailChanged(uri)
+                            }
+                        }
+                    }
             )
         }
     }
